@@ -1,5 +1,5 @@
 output "chainlink_ea_load_balancer" {
-  description = "Internal ALB endpoint to accress EA's and memoryDB"
+  description = "Internal ALB endpoint to accress EA's"
   value       = aws_lb.this[0].dns_name
 }
 

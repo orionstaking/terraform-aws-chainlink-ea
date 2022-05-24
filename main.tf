@@ -32,6 +32,8 @@ locals {
   ])
 
   create = var.secret_objects_only == false ? true : false
+
+  container_insights_monitoring = var.monitoring_enabled ? "enabled" : "disabled"
 }
 
 # ECS cluster
@@ -41,7 +43,7 @@ resource "aws_ecs_cluster" "this" {
   name  = "${var.project}-${var.environment}-ea"
   setting {
     name  = "containerInsights"
-    value = var.container_insights_monitoring
+    value = local.container_insights_monitoring
   }
 }
 
@@ -138,7 +140,7 @@ resource "aws_cloudwatch_log_group" "this" {
 }
 
 resource "aws_cloudwatch_log_group" "performance" {
-  count = var.container_insights_monitoring == "enabled" ? 1 : 0
+  count = local.container_insights_monitoring == "enabled" ? 1 : 0
 
   name = "/aws/ecs/containerinsights/${var.project}-${var.environment}-ea/performance"
   retention_in_days = 14

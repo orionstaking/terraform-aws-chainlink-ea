@@ -13,6 +13,8 @@ provider "aws" {
   }
 }
 
+data "aws_caller_identity" "current" {}
+
 module "vpc" {
   source = "terraform-aws-modules/vpc/aws"
 
@@ -31,7 +33,9 @@ module "chainlink_ea" {
 
   project     = "example"
   environment = "nonprod"
-  aws_region  = "eu-west-1"
+
+  aws_region     = "eu-west-1"
+  aws_account_id = data.aws_caller_identity.current.account_id
 
   vpc_id              = module.vpc.vpc_id
   vpc_cidr_block      = module.vpc.vpc_cidr_block

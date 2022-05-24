@@ -14,9 +14,8 @@ variable "aws_region" {
   type        = string
 }
 
-variable "container_insights_monitoring" {
-  description = "Defines enable/disable Cloudwatch Container Insights monitoring for ECS EA cluster"
-  default     = "enabled"
+variable "aws_account_id" {
+  description = "AWS account id. Used to add alarms to dashboard"
   type        = string
 }
 
@@ -80,4 +79,16 @@ variable "memorydb_num_replicas_per_shard" {
   description = "The number of replicas to apply to each shard, up to a maximum of 5"
   default     = 0
   type        = number
+}
+
+variable "monitoring_enabled" {
+  description = "Defines whether to create CloudWatch dashboard and custom metrics or not"
+  default     = true
+  type        = bool
+}
+
+variable "sns_topic_arn" {
+  description = "SNS topic arn for alerts. If not specified, module will create an empty topic and provide topic arn in the output. Then it will be possible to specify required notification method for this topic"
+  default     = ""
+  type        = string
 }
