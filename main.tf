@@ -139,12 +139,13 @@ resource "aws_cloudwatch_log_group" "this" {
   retention_in_days = 7
 }
 
-resource "aws_cloudwatch_log_group" "performance" {
-  count = local.container_insights_monitoring == "enabled" ? 1 : 0
+# Disable because of the ResourceAlreadyExistsException issue in Terraform
+# resource "aws_cloudwatch_log_group" "performance" {
+#   count = local.container_insights_monitoring == "enabled" ? 1 : 0
 
-  name              = "/aws/ecs/containerinsights/${var.project}-${var.environment}-ea/performance"
-  retention_in_days = 14
-}
+#   name              = "/aws/ecs/containerinsights/${var.project}-${var.environment}-ea/performance"
+#   retention_in_days = 14
+# }
 
 # SG for ECS Tasks
 resource "aws_security_group" "tasks_sg" {

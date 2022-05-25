@@ -16,6 +16,7 @@ resource "aws_memorydb_cluster" "this" {
   count = local.create ? 1 : 0
 
   acl_name                 = "open-access"
+  tls_enabled              = false
   name                     = "${var.project}-${var.environment}-ea"
   node_type                = var.memorydb_node_type
   num_shards               = var.memorydb_shards_count
