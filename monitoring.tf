@@ -7,7 +7,7 @@ resource "aws_sns_topic" "this" {
 
 # Log errors to Metrics transformation
 resource "aws_cloudwatch_log_metric_filter" "log_errors" {
-  for_each = {for ea in local.external_adapters: ea.name => ea if local.create && var.monitoring_enabled}
+  for_each = { for ea in local.external_adapters : ea.name => ea if local.create && var.monitoring_enabled }
 
   name           = "${var.project}-${var.environment}-${each.value.name}"
   pattern        = "error"
@@ -23,7 +23,7 @@ resource "aws_cloudwatch_log_metric_filter" "log_errors" {
 
 # Alarms based on logs
 resource "aws_cloudwatch_metric_alarm" "log_alarms" {
-  for_each = {for ea in local.external_adapters: ea.name => ea if local.create && var.monitoring_enabled}
+  for_each = { for ea in local.external_adapters : ea.name => ea if local.create && var.monitoring_enabled }
 
   alarm_name          = "${var.project}-${var.environment}-ea-${each.value.name}-log-error"
   comparison_operator = "GreaterThanThreshold"
@@ -35,12 +35,12 @@ resource "aws_cloudwatch_metric_alarm" "log_alarms" {
   threshold           = "0"
   alarm_description   = "Errors detected in ${each.value.name} external adapter CloudWatch log group"
   actions_enabled     = "true"
-  alarm_actions       = var.sns_topic_arn == "" ? [ aws_sns_topic.this[0].arn ] : [ var.sns_topic_arn ]
+  alarm_actions       = var.sns_topic_arn == "" ? [aws_sns_topic.this[0].arn] : [var.sns_topic_arn]
 }
 
 # metric alarms
 resource "aws_cloudwatch_metric_alarm" "memory_utilization" {
-  for_each = {for ea in local.external_adapters: ea.name => ea if local.create && var.monitoring_enabled}
+  for_each = { for ea in local.external_adapters : ea.name => ea if local.create && var.monitoring_enabled }
 
   alarm_name          = "${var.project}-${var.environment}-ea-${each.value.name}-MemoryUtilizationHigh"
   comparison_operator = "GreaterThanThreshold"
@@ -48,7 +48,7 @@ resource "aws_cloudwatch_metric_alarm" "memory_utilization" {
   threshold           = "80"
   alarm_description   = "Memory utilization has exceeded 80%"
   actions_enabled     = "true"
-  alarm_actions       = var.sns_topic_arn == "" ? [ aws_sns_topic.this[0].arn ] : [ var.sns_topic_arn ]
+  alarm_actions       = var.sns_topic_arn == "" ? [aws_sns_topic.this[0].arn] : [var.sns_topic_arn]
 
   metric_query {
     id          = "e1"
@@ -91,7 +91,7 @@ resource "aws_cloudwatch_metric_alarm" "memory_utilization" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "cpu_utilization" {
-  for_each = {for ea in local.external_adapters: ea.name => ea if local.create && var.monitoring_enabled}
+  for_each = { for ea in local.external_adapters : ea.name => ea if local.create && var.monitoring_enabled }
 
   alarm_name          = "${var.project}-${var.environment}-ea-${each.value.name}-CPUUtilizationHigh"
   comparison_operator = "GreaterThanThreshold"
@@ -99,7 +99,7 @@ resource "aws_cloudwatch_metric_alarm" "cpu_utilization" {
   threshold           = "80"
   alarm_description   = "CPU utilization has exceeded 80%"
   actions_enabled     = "true"
-  alarm_actions       = var.sns_topic_arn == "" ? [ aws_sns_topic.this[0].arn ] : [ var.sns_topic_arn ]
+  alarm_actions       = var.sns_topic_arn == "" ? [aws_sns_topic.this[0].arn] : [var.sns_topic_arn]
 
   metric_query {
     id          = "e1"
@@ -143,8 +143,8 @@ resource "aws_cloudwatch_metric_alarm" "cpu_utilization" {
 
 # CW Dashboard
 data "template_file" "this" {
-  for_each = {for ea in local.external_adapters: ea.name => ea if local.create && var.monitoring_enabled}
-  
+  for_each = { for ea in local.external_adapters : ea.name => ea if local.create && var.monitoring_enabled }
+
   template = file(
     "${path.module}/templates/cw_dashboard.json.tpl",
   )
@@ -160,7 +160,7 @@ data "template_file" "this" {
 }
 
 resource "aws_cloudwatch_dashboard" "this" {
-  for_each = {for ea in local.external_adapters: ea.name => ea if local.create && var.monitoring_enabled}
+  for_each = { for ea in local.external_adapters : ea.name => ea if local.create && var.monitoring_enabled }
 
   dashboard_name = "${var.project}-${var.environment}-ea-${each.value.name}"
   dashboard_body = data.template_file.this[each.value.name].rendered

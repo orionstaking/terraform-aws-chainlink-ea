@@ -31,7 +31,7 @@ variable "vpc_cidr_block" {
 
 variable "vpc_private_subnets" {
   description = "VPC private subnets where Chainlink EAs should be deployed (at least 2)"
-  type        = list
+  type        = list(any)
 }
 
 variable "external_adapters" {

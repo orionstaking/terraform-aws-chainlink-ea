@@ -27,10 +27,10 @@ data "aws_iam_policy_document" "this" {
   }
 
   dynamic "statement" {
-    for_each = {for ea in local.external_adapters: ea.name => ea}
+    for_each = { for ea in local.external_adapters : ea.name => ea }
 
     content {
-      effect  = "Allow"
+      effect = "Allow"
       actions = [
         "secretsmanager:GetSecretValue",
         "kms:Decrypt"

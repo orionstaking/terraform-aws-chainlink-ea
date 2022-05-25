@@ -4,7 +4,7 @@ resource "aws_lb" "this" {
   name               = var.project
   internal           = true
   load_balancer_type = "application"
-  security_groups    = [ aws_security_group.tasks_sg[0].id, aws_security_group.alb_sg[0].id ]
+  security_groups    = [aws_security_group.tasks_sg[0].id, aws_security_group.alb_sg[0].id]
   subnets            = var.vpc_private_subnets
 
   tags = {
@@ -13,9 +13,9 @@ resource "aws_lb" "this" {
 }
 
 resource "aws_lb_target_group" "ea" {
-  for_each = {for ea in local.external_adapters: ea.name => ea if local.create}
+  for_each = { for ea in local.external_adapters : ea.name => ea if local.create }
 
-  name                 = "${each.value.name}"
+  name                 = each.value.name
   port                 = each.value.app_port
   protocol             = "HTTP"
   target_type          = "ip"
@@ -36,14 +36,14 @@ resource "aws_lb_target_group" "ea" {
 }
 
 resource "aws_lb_listener" "ea" {
-  for_each = {for ea in local.external_adapters: ea.name => ea if local.create}
+  for_each = { for ea in local.external_adapters : ea.name => ea if local.create }
 
   load_balancer_arn = aws_lb.this[0].arn
   port              = each.value.alb_port
   protocol          = "HTTP"
 
   default_action {
-    type = "forward"
+    type             = "forward"
     target_group_arn = aws_lb_target_group.ea[each.value.name].arn
   }
 }
@@ -58,7 +58,7 @@ resource "aws_security_group" "alb_sg" {
 }
 
 resource "aws_security_group_rule" "ingress_alb_allow_ea" {
-  for_each = {for ea in local.external_adapters: ea.name => ea if local.create}
+  for_each = { for ea in local.external_adapters : ea.name => ea if local.create }
 
   type        = "ingress"
   from_port   = 0

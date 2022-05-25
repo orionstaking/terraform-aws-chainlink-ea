@@ -40,7 +40,7 @@ locals {
 resource "aws_ecs_cluster" "this" {
   count = local.create ? 1 : 0
 
-  name  = "${var.project}-${var.environment}-ea"
+  name = "${var.project}-${var.environment}-ea"
   setting {
     name  = "containerInsights"
     value = local.container_insights_monitoring
@@ -49,9 +49,9 @@ resource "aws_ecs_cluster" "this" {
 
 # ECS task definitions
 data "template_file" "ea_task_definitions" {
-  for_each = {for ea in local.external_adapters: ea.name => ea if local.create}
+  for_each = { for ea in local.external_adapters : ea.name => ea if local.create }
 
-  template = ( each.value.custom_task_definition == "true" ? 
+  template = (each.value.custom_task_definition == "true" ?
     file("${path.module}/ea_task_definitions/${each.value.name}.json.tpl") :
     file("${path.module}/ea_task_definitions/default.json.tpl")
   )
@@ -91,23 +91,23 @@ data "template_file" "ea_task_definitions" {
 }
 
 resource "aws_ecs_task_definition" "this" {
-  for_each = {for ea in local.external_adapters: ea.name => ea if local.create}
+  for_each = { for ea in local.external_adapters : ea.name => ea if local.create }
 
   family = "${var.project}-${var.environment}-${each.value.name}"
 
-  requires_compatibilities = [ "FARGATE" ]
+  requires_compatibilities = ["FARGATE"]
   network_mode             = "awsvpc"
-  cpu                      = 256
-  memory                   = 512
+  cpu                      = each.value.cpu
+  memory                   = each.value.memory
 
-  execution_role_arn    = aws_iam_role.this[0].arn
+  execution_role_arn = aws_iam_role.this[0].arn
 
   container_definitions = data.template_file.ea_task_definitions[each.value.name].rendered
 }
 
 # ECS service
 resource "aws_ecs_service" "this" {
-  for_each = {for ea in local.external_adapters: ea.name => ea if local.create}
+  for_each = { for ea in local.external_adapters : ea.name => ea if local.create }
 
   name                               = "${var.project}-${var.environment}-${each.value.name}"
   cluster                            = aws_ecs_cluster.this[0].id
@@ -119,9 +119,9 @@ resource "aws_ecs_service" "this" {
   desired_count = var.ea_desired_task_count
 
   network_configuration {
-    subnets           = var.vpc_private_subnets
-    security_groups   = [ aws_security_group.tasks_sg[0].id, aws_security_group.memorydb_sg[0].id ]
-    assign_public_ip  = false
+    subnets          = var.vpc_private_subnets
+    security_groups  = [aws_security_group.tasks_sg[0].id, aws_security_group.memorydb_sg[0].id]
+    assign_public_ip = false
   }
 
   load_balancer {
@@ -133,16 +133,16 @@ resource "aws_ecs_service" "this" {
 
 # Log groups to store logs from EAs
 resource "aws_cloudwatch_log_group" "this" {
-  for_each = {for ea in local.external_adapters: ea.name => ea if local.create}
+  for_each = { for ea in local.external_adapters : ea.name => ea if local.create }
 
-  name = "/aws/ecs/${var.project}-${var.environment}-${each.value.name}"
+  name              = "/aws/ecs/${var.project}-${var.environment}-${each.value.name}"
   retention_in_days = 7
 }
 
 resource "aws_cloudwatch_log_group" "performance" {
   count = local.container_insights_monitoring == "enabled" ? 1 : 0
 
-  name = "/aws/ecs/containerinsights/${var.project}-${var.environment}-ea/performance"
+  name              = "/aws/ecs/containerinsights/${var.project}-${var.environment}-ea/performance"
   retention_in_days = 14
 }
 
@@ -158,18 +158,18 @@ resource "aws_security_group" "tasks_sg" {
 resource "aws_security_group_rule" "ingress_allow_self" {
   count = local.create ? 1 : 0
 
-  type        = "ingress"
-  from_port   = 0
-  to_port     = 0
-  protocol    = "-1"
-  self        = true
+  type      = "ingress"
+  from_port = 0
+  to_port   = 0
+  protocol  = "-1"
+  self      = true
 
   security_group_id = aws_security_group.tasks_sg[0].id
 }
 
 resource "aws_security_group_rule" "egress_allow_all" {
   count = local.create ? 1 : 0
-  
+
   type        = "egress"
   from_port   = 0
   to_port     = 0

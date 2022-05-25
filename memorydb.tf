@@ -40,18 +40,18 @@ resource "aws_security_group" "memorydb_sg" {
 resource "aws_security_group_rule" "ingress_mem_allow_self" {
   count = local.create ? 1 : 0
 
-  type        = "ingress"
-  from_port   = 0
-  to_port     = 0
-  protocol    = "-1"
-  self        = true
+  type      = "ingress"
+  from_port = 0
+  to_port   = 0
+  protocol  = "-1"
+  self      = true
 
   security_group_id = aws_security_group.memorydb_sg[0].id
 }
 
 resource "aws_security_group_rule" "egress_mem_allow_all" {
   count = local.create ? 1 : 0
-  
+
   type        = "egress"
   from_port   = 0
   to_port     = 0

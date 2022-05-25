@@ -26,7 +26,9 @@ module "chainlink_ea" {
 
   project     = "example"
   environment = "nonprod"
-  aws_region  = data.aws_region.current.name
+
+  aws_region     = "eu-west-1"
+  aws_account_id = data.aws_caller_identity.current.account_id
 
   vpc_id              = "vpc-09e1usdaedafe00f2"
   vpc_cidr_block      = "10.100.0.0/20"
@@ -135,7 +137,13 @@ No modules.
 
 | Name | Type |
 |------|------|
+| [aws_cloudwatch_dashboard.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_dashboard) | resource |
+| [aws_cloudwatch_log_group.performance](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_log_group) | resource |
 | [aws_cloudwatch_log_group.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_log_group) | resource |
+| [aws_cloudwatch_log_metric_filter.log_errors](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_log_metric_filter) | resource |
+| [aws_cloudwatch_metric_alarm.cpu_utilization](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_metric_alarm) | resource |
+| [aws_cloudwatch_metric_alarm.log_alarms](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_metric_alarm) | resource |
+| [aws_cloudwatch_metric_alarm.memory_utilization](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_metric_alarm) | resource |
 | [aws_ecs_cluster.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ecs_cluster) | resource |
 | [aws_ecs_service.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ecs_service) | resource |
 | [aws_ecs_task_definition.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ecs_task_definition) | resource |
@@ -159,15 +167,17 @@ No modules.
 | [aws_security_group_rule.ingress_alb_allow_ea](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) | resource |
 | [aws_security_group_rule.ingress_allow_self](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) | resource |
 | [aws_security_group_rule.ingress_mem_allow_self](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) | resource |
+| [aws_sns_topic.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/sns_topic) | resource |
 | [aws_iam_policy_document.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [template_file.ea_task_definitions](https://registry.terraform.io/providers/hashicorp/template/latest/docs/data-sources/file) | data source |
+| [template_file.this](https://registry.terraform.io/providers/hashicorp/template/latest/docs/data-sources/file) | data source |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
+| <a name="input_aws_account_id"></a> [aws\_account\_id](#input\_aws\_account\_id) | AWS account id. Used to add alarms to dashboard | `string` | n/a | yes |
 | <a name="input_aws_region"></a> [aws\_region](#input\_aws\_region) | AWS Region (required for CloudWatch logs configuration) | `string` | n/a | yes |
-| <a name="input_container_insights_monitoring"></a> [container\_insights\_monitoring](#input\_container\_insights\_monitoring) | Defines enable/disable Cloudwatch Container Insights monitoring for ECS EA cluster | `string` | `"enabled"` | no |
 | <a name="input_ea_desired_task_count"></a> [ea\_desired\_task\_count](#input\_ea\_desired\_task\_count) | Number of instances of the task definition to place and keep running | `number` | `1` | no |
 | <a name="input_environment"></a> [environment](#input\_environment) | Environment name | `string` | `"nonprod"` | no |
 | <a name="input_external_adapters"></a> [external\_adapters](#input\_external\_adapters) | n/a | `map` | `{}` | no |
@@ -175,8 +185,10 @@ No modules.
 | <a name="input_memorydb_num_replicas_per_shard"></a> [memorydb\_num\_replicas\_per\_shard](#input\_memorydb\_num\_replicas\_per\_shard) | The number of replicas to apply to each shard, up to a maximum of 5 | `number` | `0` | no |
 | <a name="input_memorydb_shards_count"></a> [memorydb\_shards\_count](#input\_memorydb\_shards\_count) | The number of shards in the cluster | `number` | `1` | no |
 | <a name="input_memorydb_snapshot_retention_limit"></a> [memorydb\_snapshot\_retention\_limit](#input\_memorydb\_snapshot\_retention\_limit) | The number of days for which MemoryDB retains automatic snapshots before deleting them. When set to 0, automatic backups are disabled | `number` | `0` | no |
+| <a name="input_monitoring_enabled"></a> [monitoring\_enabled](#input\_monitoring\_enabled) | Defines whether to create CloudWatch dashboard and custom metrics or not | `bool` | `true` | no |
 | <a name="input_project"></a> [project](#input\_project) | Project name | `string` | n/a | yes |
 | <a name="input_secret_objects_only"></a> [secret\_objects\_only](#input\_secret\_objects\_only) | If 'true' and 'tfstate\_secrets\_store' is 'false', 'terraform apply' will create only AWS Secrets Manager objects to store API keys for EA's. Once all required secrets will be set manually, set this var to 'true' to create remaining AWS infra to run EA's | `bool` | `false` | no |
+| <a name="input_sns_topic_arn"></a> [sns\_topic\_arn](#input\_sns\_topic\_arn) | SNS topic arn for alerts. If not specified, module will create an empty topic and provide topic arn in the output. Then it will be possible to specify required notification method for this topic | `string` | `""` | no |
 | <a name="input_tfstate_secrets_store"></a> [tfstate\_secrets\_store](#input\_tfstate\_secrets\_store) | Defines whether to store EA's secrets in plane text in terraform store or not. If 'true', secrets for EA should be specified in external\_adapters var. If 'false', it is recommended to run the module with 'initialize' variabe equals to 'true' to set the secrets manually in AWS Secrets Manager | `bool` | `true` | no |
 | <a name="input_vpc_cidr_block"></a> [vpc\_cidr\_block](#input\_vpc\_cidr\_block) | The CIDR block of the VPC | `string` | n/a | yes |
 | <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id) | ID of the VPC where Chainlink EAs should be deployed | `string` | n/a | yes |
@@ -186,7 +198,7 @@ No modules.
 
 | Name | Description |
 |------|-------------|
-| <a name="output_chainlink_ea_load_balancer"></a> [chainlink\_ea\_load\_balancer](#output\_chainlink\_ea\_load\_balancer) | Internal ALB endpoint to accress EA's and memoryDB |
+| <a name="output_chainlink_ea_load_balancer"></a> [chainlink\_ea\_load\_balancer](#output\_chainlink\_ea\_load\_balancer) | Internal ALB endpoint to accress EA's |
 | <a name="output_chainlink_ea_memory_db_address"></a> [chainlink\_ea\_memory\_db\_address](#output\_chainlink\_ea\_memory\_db\_address) | DNS hostname of the cluster configuration endpoint |
 | <a name="output_chainlink_ea_memory_db_port"></a> [chainlink\_ea\_memory\_db\_port](#output\_chainlink\_ea\_memory\_db\_port) | Port number that the cluster configuration endpoint is listening on |
 <!-- END_TF_DOCS -->
