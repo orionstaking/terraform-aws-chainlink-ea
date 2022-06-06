@@ -134,7 +134,7 @@
             "y": 3,
             "x": 18,
             "properties": {
-                "title": "Feeder Alarms Status",
+                "title": "${ea_name} EA Alarms Status",
                 "alarms": [
                     "arn:aws:cloudwatch:${region}:${account_id}:alarm:${project}-${environment}-ea-${ea_name}-CPUUtilizationHigh",
                     "arn:aws:cloudwatch:${region}:${account_id}:alarm:${project}-${environment}-ea-${ea_name}-MemoryUtilizationHigh"
@@ -148,7 +148,7 @@
             "y": 6,
             "x": 18,
             "properties": {
-                "title": "Feeder Logs Status",
+                "title": "${ea_name} EA Logs Status",
                 "alarms": [
                     "arn:aws:cloudwatch:${region}:${account_id}:alarm:${project}-${environment}-ea-${ea_name}-log-error"
                 ]

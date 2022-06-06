@@ -27,10 +27,10 @@ resource "aws_cloudwatch_metric_alarm" "log_alarms" {
 
   alarm_name          = "${var.project}-${var.environment}-ea-${each.value.name}-log-error"
   comparison_operator = "GreaterThanThreshold"
-  evaluation_periods  = "1"
+  evaluation_periods  = "5"
   metric_name         = "${var.project}-${var.environment}-ea-${each.value.name}-log-error"
   namespace           = "${var.project}-${var.environment}-ea-log-errors"
-  period              = "60"
+  period              = "180"
   statistic           = "Sum"
   threshold           = "0"
   alarm_description   = "Errors detected in ${each.value.name} external adapter CloudWatch log group"
@@ -141,12 +141,72 @@ resource "aws_cloudwatch_metric_alarm" "cpu_utilization" {
   }
 }
 
-# CW Dashboard
-data "template_file" "this" {
+resource "aws_cloudwatch_metric_alarm" "elb" {
+  for_each = local.create && var.monitoring_enabled ? toset(["4XX", "5XX"]) : []
+
+  alarm_name          = "${var.project}-${var.environment}-ea-elb-${each.key}"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = "3"
+  metric_name         = "HTTPCode_ELB_${each.key}_Count"
+  namespace           = "AWS/ApplicationELB"
+  period              = "180"
+  statistic           = "Sum"
+  threshold           = "0"
+  alarm_description   = "The number of HTTP 4XX client error codes for ${var.project}-${var.environment} has increased"
+  actions_enabled     = "true"
+  alarm_actions       = var.sns_topic_arn == "" ? [aws_sns_topic.this[0].arn] : [var.sns_topic_arn]
+
+  dimensions = {
+    LoadBalancer = aws_lb.this[0].arn_suffix
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "memorydb_cpu" {
+  count = local.create && var.monitoring_enabled ? 1 : 0
+
+  alarm_name          = "${var.project}-${var.environment}-ea-memorydb-CPUUtilization"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = "1"
+  metric_name         = "CPUUtilization"
+  namespace           = "AWS/MemoryDB"
+  period              = "180"
+  statistic           = "Sum"
+  threshold           = "80"
+  alarm_description   = "CPU utilization of MemoryDB cluster has exceeded 80%"
+  actions_enabled     = "true"
+  alarm_actions       = var.sns_topic_arn == "" ? [aws_sns_topic.this[0].arn] : [var.sns_topic_arn]
+
+  dimensions = {
+    ClusterName = "${var.project}-${var.environment}-ea"
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "memorydb_memory" {
+  count = local.create && var.monitoring_enabled ? 1 : 0
+
+  alarm_name          = "${var.project}-${var.environment}-ea-memorydb-DatabaseMemoryUsagePercentage"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = "1"
+  metric_name         = "DatabaseMemoryUsagePercentage"
+  namespace           = "AWS/MemoryDB"
+  period              = "180"
+  statistic           = "Sum"
+  threshold           = "80"
+  alarm_description   = "Memory utilization of MemoryDB cluster has exceeded 80%"
+  actions_enabled     = "true"
+  alarm_actions       = var.sns_topic_arn == "" ? [aws_sns_topic.this[0].arn] : [var.sns_topic_arn]
+
+  dimensions = {
+    ClusterName = "${var.project}-${var.environment}-ea"
+  }
+}
+
+# CW Dashboards for EA
+data "template_file" "ea" {
   for_each = { for ea in local.external_adapters : ea.name => ea if local.create && var.monitoring_enabled }
 
   template = file(
-    "${path.module}/templates/cw_dashboard.json.tpl",
+    "${path.module}/templates/cw_dashboard_ea.json.tpl",
   )
 
   vars = {
@@ -159,9 +219,32 @@ data "template_file" "this" {
   }
 }
 
-resource "aws_cloudwatch_dashboard" "this" {
+resource "aws_cloudwatch_dashboard" "ea" {
   for_each = { for ea in local.external_adapters : ea.name => ea if local.create && var.monitoring_enabled }
 
   dashboard_name = "${var.project}-${var.environment}-ea-${each.value.name}"
-  dashboard_body = data.template_file.this[each.value.name].rendered
+  dashboard_body = data.template_file.ea[each.value.name].rendered
+}
+
+# CW Dashboard for ELB and MemoryDB
+data "template_file" "comm" {
+  count = local.create && var.monitoring_enabled ? 1 : 0
+
+  template = file(
+    "${path.module}/templates/cw_dashboard_comm.json.tpl",
+  )
+
+  vars = {
+    project        = var.project
+    environment    = var.environment
+    region         = var.aws_region
+    elb_arn_suffix = aws_lb.this[0].arn_suffix
+  }
+}
+
+resource "aws_cloudwatch_dashboard" "comm" {
+  count = local.create && var.monitoring_enabled ? 1 : 0
+
+  dashboard_name = "${var.project}-${var.environment}-ea-common"
+  dashboard_body = data.template_file.comm[0].rendered
 }

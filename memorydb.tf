@@ -26,7 +26,7 @@ resource "aws_memorydb_cluster" "this" {
   snapshot_retention_limit = var.memorydb_snapshot_retention_limit
   subnet_group_name        = aws_memorydb_subnet_group.this[0].id
   parameter_group_name     = aws_memorydb_parameter_group.this[0].id
-  # sns_topic_arn            = # TODO
+  # sns_topic_arn            = var.monitoring_enabled ? ( var.sns_topic_arn == "" ? aws_sns_topic.this[0].arn : var.sns_topic_arn ) : ""
 }
 
 # SG for MemoryDB
