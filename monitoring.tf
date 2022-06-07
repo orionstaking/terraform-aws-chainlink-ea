@@ -35,7 +35,9 @@ resource "aws_cloudwatch_metric_alarm" "log_alarms" {
   threshold           = "0"
   alarm_description   = "Errors detected in ${each.value.name} external adapter CloudWatch log group"
   actions_enabled     = "true"
+  treat_missing_data  = "notBreaching"
   alarm_actions       = var.sns_topic_arn == "" ? [aws_sns_topic.this[0].arn] : [var.sns_topic_arn]
+  ok_actions          = var.sns_topic_arn == "" ? [aws_sns_topic.this[0].arn] : [var.sns_topic_arn]
 }
 
 # metric alarms
@@ -49,6 +51,7 @@ resource "aws_cloudwatch_metric_alarm" "memory_utilization" {
   alarm_description   = "Memory utilization has exceeded 80%"
   actions_enabled     = "true"
   alarm_actions       = var.sns_topic_arn == "" ? [aws_sns_topic.this[0].arn] : [var.sns_topic_arn]
+  ok_actions          = var.sns_topic_arn == "" ? [aws_sns_topic.this[0].arn] : [var.sns_topic_arn]
 
   metric_query {
     id          = "e1"
@@ -100,6 +103,7 @@ resource "aws_cloudwatch_metric_alarm" "cpu_utilization" {
   alarm_description   = "CPU utilization has exceeded 80%"
   actions_enabled     = "true"
   alarm_actions       = var.sns_topic_arn == "" ? [aws_sns_topic.this[0].arn] : [var.sns_topic_arn]
+  ok_actions          = var.sns_topic_arn == "" ? [aws_sns_topic.this[0].arn] : [var.sns_topic_arn]
 
   metric_query {
     id          = "e1"
@@ -154,7 +158,9 @@ resource "aws_cloudwatch_metric_alarm" "elb" {
   threshold           = "0"
   alarm_description   = "The number of HTTP 4XX client error codes for ${var.project}-${var.environment} has increased"
   actions_enabled     = "true"
+  treat_missing_data  = "notBreaching"
   alarm_actions       = var.sns_topic_arn == "" ? [aws_sns_topic.this[0].arn] : [var.sns_topic_arn]
+  ok_actions          = var.sns_topic_arn == "" ? [aws_sns_topic.this[0].arn] : [var.sns_topic_arn]
 
   dimensions = {
     LoadBalancer = aws_lb.this[0].arn_suffix
@@ -175,6 +181,7 @@ resource "aws_cloudwatch_metric_alarm" "memorydb_cpu" {
   alarm_description   = "CPU utilization of MemoryDB cluster has exceeded 80%"
   actions_enabled     = "true"
   alarm_actions       = var.sns_topic_arn == "" ? [aws_sns_topic.this[0].arn] : [var.sns_topic_arn]
+  ok_actions          = var.sns_topic_arn == "" ? [aws_sns_topic.this[0].arn] : [var.sns_topic_arn]
 
   dimensions = {
     ClusterName = "${var.project}-${var.environment}-ea"
@@ -195,6 +202,7 @@ resource "aws_cloudwatch_metric_alarm" "memorydb_memory" {
   alarm_description   = "Memory utilization of MemoryDB cluster has exceeded 80%"
   actions_enabled     = "true"
   alarm_actions       = var.sns_topic_arn == "" ? [aws_sns_topic.this[0].arn] : [var.sns_topic_arn]
+  ok_actions          = var.sns_topic_arn == "" ? [aws_sns_topic.this[0].arn] : [var.sns_topic_arn]
 
   dimensions = {
     ClusterName = "${var.project}-${var.environment}-ea"
