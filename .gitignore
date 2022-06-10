@@ -4,6 +4,9 @@
 # Terraform lockfile
 .terraform.lock.hcl
 
+# Terraform test files
+*_test.tf
+
 # .tfstate files
 *.tfstate
 *.tfstate.*

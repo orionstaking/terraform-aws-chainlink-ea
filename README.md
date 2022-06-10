@@ -13,6 +13,8 @@ At the time of writing, the following External Adapters are fully supported and 
   - coinmarketcap
   - tiingo
   - cryptocompare
+  - alphavantage
+  - coinpaprika
 
 All adapters, that available on [chainlink/adapters](https://gallery.ecr.aws/?searchTerm=chainlink%2Fadapters) could be supported as well, but not tested yet.
 

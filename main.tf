@@ -4,8 +4,10 @@ locals {
       name                     = key
       custom_task_definition   = lookup(value, "custom", "false")
       version                  = lookup(value, "version", "latest")
-      api_tier                 = lookup(value, "api_tier", "")
-      api_key                  = lookup(value, "api_key", null)
+      api_tier_http            = lookup(value, "api_tier_http", "")
+      api_tier_ws              = lookup(value, "api_tier_ws", "")
+      api_key                  = lookup(value, "api_key", "")
+      ws_enabled               = lookup(value, "ws_enabled", false)
       app_port                 = lookup(value, "app_port", 8080)
       alb_port                 = lookup(value, "alb_port", null)
       health_path              = lookup(value, "health_path", "/health")
@@ -60,8 +62,10 @@ data "template_file" "ea_task_definitions" {
     project                  = var.project
     environment              = var.environment
     ea_name                  = each.value.name
-    api_tier                 = each.value.api_tier
-    api_key                  = aws_secretsmanager_secret.api_key_obj[each.value.name].arn
+    api_tier_http            = each.value.api_tier_http
+    api_tier_ws              = each.value.api_tier_ws
+    api_key                  = each.value.api_key != "" ? aws_secretsmanager_secret.api_key_obj[each.value.name].arn : ""
+    ws_enabled               = each.value.ws_enabled
     docker_image             = "public.ecr.aws/chainlink/adapters/${each.value.name}-adapter:${each.value.version}"
     aws_region               = var.aws_region
     port                     = each.value.app_port

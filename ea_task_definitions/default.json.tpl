@@ -23,7 +23,9 @@
         { "name" : "RATE_LIMIT_ENABLED", "value" : "${rate_limit_enabled}" },
         { "name" : "WARMUP_ENABLED", "value" : "${warmup_enabled}" },
         { "name" : "RATE_LIMIT_API_PROVIDER", "value" : "${ea_name}" },
-        { "name" : "RATE_LIMIT_API_TIER", "value" : "${api_tier}" },
+        { "name" : "RATE_LIMIT_API_TIER_HTTP", "value" : "${api_tier_http}" },
+        { "name" : "RATE_LIMIT_API_TIER_WS", "value" : "${api_tier_ws}" },
+        { "name" : "WS_ENABLED", "value" : "${ws_enabled}" },
         { "name" : "REQUEST_COALESCING_ENABLED", "value" : "${request_coalescing_enabled}" },
         { "name" : "REQUEST_COALESCING_INTERVAL", "value" : "${request_coalescing_interval}" },
         { "name" : "REQUEST_COALESCING_INTERVAL_MAX", "value" : "${request_coalescing_interval_max}" },
@@ -36,12 +38,14 @@
         { "name" : "METRICS_NAME", "value" : "${ea_name}" },
         { "name" : "RETRY", "value" : "${retry}" }
       ],
+    %{ if api_key != "" }
     "secrets": [
       {
         "name": "API_KEY",
         "valueFrom": "${api_key}"
       }
     ],
+    %{ endif }
     "logConfiguration": {
       "logDriver": "awslogs",
       "options": {

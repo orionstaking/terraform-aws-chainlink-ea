@@ -71,6 +71,18 @@ module "chainlink_ea" {
       api_tier = "professional",
       alb_port = "1114",
       api_key  = "api_key"
+    },
+    alphavantage = {
+      version       = "1.1.39",
+      api_tier_http = "free",
+      alb_port      = "1152",
+      api_key       = "AY0LXXCFZ9SPAEXE" # https://www.alphavantage.co/support/#api-key
+    },
+    coinpaprika = {
+      version       = "1.8.10",
+      api_tier_http = "free",
+      alb_port      = "1116",
+      api_key       = "" # https://coinpaprika.com/api/panel/
     }
   }
 }
