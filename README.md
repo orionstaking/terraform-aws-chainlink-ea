@@ -15,6 +15,10 @@ At the time of writing, the following External Adapters are fully supported and 
   - cryptocompare
   - alphavantage
   - coinpaprika
+  - coinapi
+  - fixer
+  - currencylayer
+  - unibit
 
 All adapters, that available on [chainlink/adapters](https://gallery.ecr.aws/?searchTerm=chainlink%2Fadapters) could be supported as well, but not tested yet.
 
@@ -24,7 +28,8 @@ All adapters, that available on [chainlink/adapters](https://gallery.ecr.aws/?se
 
 ```hcl
 module "chainlink_ea" {
-  source = "github.com/orionterra/terraform-aws-chainlink-ea?ref=main"
+  source  = "orionterra/chainlink-ea/aws"
+  version = "1.1.0"
 
   project     = "example"
   environment = "nonprod"
@@ -36,29 +41,12 @@ module "chainlink_ea" {
   vpc_cidr_block      = "10.100.0.0/20"
   vpc_private_subnets = [ "subnet-082682fbde3f95edc", "subnet-092clfgc8f424cab3" ]
 
+  # Examples for all supprted and tested adapters could be found in ./examples/complete_memorydb_redis
   external_adapters = {
     coingecko = {
       version  = "1.6.7",
       api_tier = "analyst",
       alb_port = "1113",
-      api_key  = "api_key"
-    },
-    tiingo = {
-      version  = "1.10.7",
-      api_tier = "power",
-      alb_port = "1134",
-      api_key  = "api_key"
-    },
-    coinmarketcap = {
-      version  = "1.3.39",
-      api_tier = "startup",
-      alb_port = "1115",
-      api_key  = "api_key"
-    },
-    cryptocompare = {
-      version  = "1.3.26",
-      api_tier = "professional",
-      alb_port = "1114",
       api_key  = "api_key"
     }
   }
@@ -108,13 +96,6 @@ The list of required actions:
 ## Examples
 
 - [Complete example with MemoryDB](./examples/complete_memorydb_redis/main.tf)
-- [Complete example with Redis on Fargate](./examples/complete_fargate_redis/main.tf) # TODO
-
-## TODO
-
-- CloudWatch monitoring
-- Support more adapters (tests)
-- etc.
 
 <!-- BEGIN_TF_DOCS -->
 ## Requirements

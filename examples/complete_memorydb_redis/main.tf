@@ -43,46 +43,71 @@ module "chainlink_ea" {
 
   external_adapters = {
     coingecko = {
-      version     = "1.6.7",
-      api_tier    = "analyst",
-      alb_port    = "1113",
-      api_key     = "api_key",
-      cpu         = 256,
-      memory      = 512,
-      log_level   = "info",
-      health_path = "/health",
-      timeout     = "30000"
+      version       = "1.6.7",
+      api_tier_http = "analyst",
+      alb_port      = "1113",
+      api_key       = "api_key", # https://www.coingecko.com/en/developers/dashboard
+      cpu           = 256,
+      memory        = 512,
+      log_level     = "info",
+      health_path   = "/health",
+      timeout       = "30000"
       # full list in main README.md
     },
     tiingo = {
-      version  = "1.10.7",
-      api_tier = "power",
-      alb_port = "1134",
-      api_key  = "api_key"
+      version       = "1.10.7",
+      api_tier_http = "power",
+      alb_port      = "1134",
+      api_key       = "api_key" # https://api.tiingo.com/account/profile
     },
     coinmarketcap = {
-      version  = "1.3.39",
-      api_tier = "startup",
-      alb_port = "1115",
-      api_key  = "api_key"
+      version       = "1.3.39",
+      api_tier_http = "startup",
+      alb_port      = "1115",
+      api_key       = "api_key" # https://pro.coinmarketcap.com/account
     },
     cryptocompare = {
-      version  = "1.3.26",
-      api_tier = "professional",
-      alb_port = "1114",
-      api_key  = "api_key"
+      version       = "1.3.26",
+      api_tier_http = "professional",
+      alb_port      = "1114",
+      api_key       = "api_key" # https://www.cryptocompare.com/cryptopian/api-keys
     },
     alphavantage = {
       version       = "1.1.39",
       api_tier_http = "free",
       alb_port      = "1152",
-      api_key       = "AY0LXXCFZ9SPAEXE" # https://www.alphavantage.co/support/#api-key
+      api_key       = "api_key" # https://www.alphavantage.co/support/#api-key
     },
     coinpaprika = {
       version       = "1.8.10",
       api_tier_http = "free",
       alb_port      = "1116",
-      api_key       = "" # https://coinpaprika.com/api/panel/
+      api_key       = "api_key" # https://coinpaprika.com/api/panel/
+    },
+    coinapi = {
+      version       = "1.1.41",
+      api_tier_http = "free",
+      alb_port      = "1112",
+      api_key       = "api_key" # https://www.coinapi.io/Account/GetCode
+      ws_enabled    = true
+    },
+    fixer = {
+      version       = "1.3.38",
+      api_tier_http = "free",
+      alb_port      = "1130",
+      api_key       = "api_key" # https://fixer.io/
+    },
+    currencylayer = {
+      version       = "1.3.38",
+      api_tier_http = "free",
+      alb_port      = "1141",
+      api_key       = "api_key" # https://fixer.io/
+    },
+    unibit = {
+      version       = "1.3.35",
+      api_tier_http = "freetrial",
+      alb_port      = "1143",
+      api_key       = "api_key" # https://unibit.ai/signin
     }
   }
 }
