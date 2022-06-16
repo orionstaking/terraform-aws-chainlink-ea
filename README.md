@@ -19,6 +19,9 @@ At the time of writing, the following External Adapters are fully supported and 
   - fixer
   - currencylayer
   - unibit
+  - bitex
+  - intrinio
+  - nomics
 
 All adapters, that available on [chainlink/adapters](https://gallery.ecr.aws/?searchTerm=chainlink%2Fadapters) could be supported as well, but not tested yet.
 
@@ -185,6 +188,7 @@ No modules.
 
 | Name | Description |
 |------|-------------|
+| <a name="output_chainlink_ea_endpoints"></a> [chainlink\_ea\_endpoints](#output\_chainlink\_ea\_endpoints) | External Adapter endpoints that could be accessible inside VPC CIDR block |
 | <a name="output_chainlink_ea_load_balancer"></a> [chainlink\_ea\_load\_balancer](#output\_chainlink\_ea\_load\_balancer) | Internal ALB endpoint to accress EA's |
 | <a name="output_chainlink_ea_memory_db_address"></a> [chainlink\_ea\_memory\_db\_address](#output\_chainlink\_ea\_memory\_db\_address) | DNS hostname of the cluster configuration endpoint |
 | <a name="output_chainlink_ea_memory_db_port"></a> [chainlink\_ea\_memory\_db\_port](#output\_chainlink\_ea\_memory\_db\_port) | Port number that the cluster configuration endpoint is listening on |
