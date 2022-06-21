@@ -209,50 +209,20 @@ resource "aws_cloudwatch_metric_alarm" "memorydb_memory" {
   }
 }
 
-# CW Dashboards for EA
-data "template_file" "ea" {
-  for_each = { for ea in local.external_adapters : ea.name => ea if local.create && var.monitoring_enabled }
+resource "aws_cloudwatch_dashboard" "this" {
+  count = local.create && var.monitoring_enabled ? 1 : 0
 
-  template = file(
+  dashboard_name = "${var.project}-${var.environment}-ea"
+  # dashboard_body = data.template_file.adapters[0].rendered
+  dashboard_body = templatefile(
     "${path.module}/templates/cw_dashboard_ea.json.tpl",
+    {
+      project        = var.project
+      environment    = var.environment
+      region         = var.aws_region
+      account_id     = var.aws_account_id
+      ea_names       = flatten([ for key, value in var.external_adapters : [ key ] ])
+      elb_arn_suffix = aws_lb.this[0].arn_suffix
+    }
   )
-
-  vars = {
-    project     = var.project
-    environment = var.environment
-    region      = var.aws_region
-    account_id  = var.aws_account_id
-    ea_name     = each.value.name
-    log_group   = aws_cloudwatch_log_group.this[each.value.name].name
-  }
-}
-
-resource "aws_cloudwatch_dashboard" "ea" {
-  for_each = { for ea in local.external_adapters : ea.name => ea if local.create && var.monitoring_enabled }
-
-  dashboard_name = "${var.project}-${var.environment}-ea-${each.value.name}"
-  dashboard_body = data.template_file.ea[each.value.name].rendered
-}
-
-# CW Dashboard for ELB and MemoryDB
-data "template_file" "comm" {
-  count = local.create && var.monitoring_enabled ? 1 : 0
-
-  template = file(
-    "${path.module}/templates/cw_dashboard_comm.json.tpl",
-  )
-
-  vars = {
-    project        = var.project
-    environment    = var.environment
-    region         = var.aws_region
-    elb_arn_suffix = aws_lb.this[0].arn_suffix
-  }
-}
-
-resource "aws_cloudwatch_dashboard" "comm" {
-  count = local.create && var.monitoring_enabled ? 1 : 0
-
-  dashboard_name = "${var.project}-${var.environment}-ea-common"
-  dashboard_body = data.template_file.comm[0].rendered
 }
