@@ -43,102 +43,114 @@ module "chainlink_ea" {
 
   external_adapters = {
     coingecko = {
-      # https://github.com/smartcontractkit/external-adapters-js/tree/develop/packages/sources/coingecko
-      version       = "1.6.7", # https://gallery.ecr.aws/chainlink/adapters/coingecko-adapter
-      api_tier_http = "analyst",
-      alb_port      = "1113",
-      api_key       = "api_key", # https://www.coingecko.com/en/developers/dashboard
-      cpu           = 256,
-      memory        = 512,
-      log_level     = "info",
-      health_path   = "/health",
-      timeout       = "30000"
+      # source code:  https://github.com/smartcontractkit/external-adapters-js/tree/develop/packages/sources/coingecko
+      # subscription: https://github.com/smartcontractkit/external-adapters-js/blob/develop/packages/sources/coingecko/src/config/limits.json
+      version     = "1.6.7", # https://gallery.ecr.aws/chainlink/adapters/coingecko-adapter
+      api_tier    = "analyst",
+      alb_port    = "1113",
+      api_key     = "api_key", # https://www.coingecko.com/en/developers/dashboard
+      cpu         = 256,
+      memory      = 512,
+      log_level   = "info",
+      health_path = "/health",
+      timeout     = "30000"
       # full list in main README.md
     },
     tiingo = {
-      # https://github.com/smartcontractkit/external-adapters-js/tree/develop/packages/sources/tiingo
-      version       = "1.10.7", # https://gallery.ecr.aws/chainlink/adapters/tiingo-adapter
-      api_tier_http = "power",
-      alb_port      = "1134",
-      api_key       = "api_key" # https://api.tiingo.com/account/profile
+      # source code:  https://github.com/smartcontractkit/external-adapters-js/tree/develop/packages/sources/tiingo
+      # subscription: https://github.com/smartcontractkit/external-adapters-js/blob/develop/packages/sources/tiingo/src/config/limits.json
+      version  = "1.10.7", # https://gallery.ecr.aws/chainlink/adapters/tiingo-adapter
+      api_tier = "power",
+      alb_port = "1134",
+      api_key  = "api_key" # https://api.tiingo.com/account/profile
     },
     coinmarketcap = {
-      # https://github.com/smartcontractkit/external-adapters-js/tree/develop/packages/sources/coinmarketcap
-      version       = "1.3.39", # https://gallery.ecr.aws/chainlink/adapters/coinmarketcap-adapter
-      api_tier_http = "startup",
-      alb_port      = "1115",
-      api_key       = "api_key" # https://pro.coinmarketcap.com/account
+      # source code:  https://github.com/smartcontractkit/external-adapters-js/tree/develop/packages/sources/coinmarketcap
+      # subscription: https://github.com/smartcontractkit/external-adapters-js/blob/develop/packages/sources/coinmarketcap/src/config/limits.json
+      version  = "1.3.39", # https://gallery.ecr.aws/chainlink/adapters/coinmarketcap-adapter
+      api_tier = "startup",
+      alb_port = "1115",
+      api_key  = "api_key" # https://pro.coinmarketcap.com/account
     },
     cryptocompare = {
-      # https://github.com/smartcontractkit/external-adapters-js/tree/develop/packages/sources/cryptocompare
-      version       = "1.3.26", # https://gallery.ecr.aws/chainlink/adapters/cryptocompare-adapter
-      api_tier_http = "professional",
-      alb_port      = "1114",
-      api_key       = "api_key" # https://www.cryptocompare.com/cryptopian/api-keys
+      # source code:  https://github.com/smartcontractkit/external-adapters-js/tree/develop/packages/sources/cryptocompare
+      # subscription: https://github.com/smartcontractkit/external-adapters-js/blob/develop/packages/sources/cryptocompare/src/config/limits.json
+      version  = "1.3.26", # https://gallery.ecr.aws/chainlink/adapters/cryptocompare-adapter
+      api_tier = "professional",
+      alb_port = "1114",
+      api_key  = "api_key" # https://www.cryptocompare.com/cryptopian/api-keys
     },
     alphavantage = {
-      # https://github.com/smartcontractkit/external-adapters-js/tree/develop/packages/sources/alphavantage
-      version       = "1.1.39", # https://gallery.ecr.aws/chainlink/adapters/alphavantage-adapter
-      api_tier_http = "free",
-      alb_port      = "1152",
-      api_key       = "api_key" # https://www.alphavantage.co/support/#api-key
+      # source code:  https://github.com/smartcontractkit/external-adapters-js/tree/develop/packages/sources/alphavantage
+      # subscription: https://github.com/smartcontractkit/external-adapters-js/blob/develop/packages/sources/alphavantage/src/config/limits.json
+      version  = "1.1.39", # https://gallery.ecr.aws/chainlink/adapters/alphavantage-adapter
+      api_tier = "free",
+      alb_port = "1152",
+      api_key  = "api_key" # https://www.alphavantage.co/support/#api-key
     },
     coinpaprika = {
-      # https://github.com/smartcontractkit/external-adapters-js/tree/develop/packages/sources/coinpaprika
-      version       = "1.8.10", # https://gallery.ecr.aws/chainlink/adapters/coinpaprika-adapter
-      api_tier_http = "free",
-      alb_port      = "1116",
-      api_key       = "api_key" # https://coinpaprika.com/api/panel/
+      # source code:  https://github.com/smartcontractkit/external-adapters-js/tree/develop/packages/sources/coinpaprika
+      # subscription: https://github.com/smartcontractkit/external-adapters-js/blob/develop/packages/sources/coinpaprika/src/config/limits.json
+      version  = "1.8.10", # https://gallery.ecr.aws/chainlink/adapters/coinpaprika-adapter
+      api_tier = "free",
+      alb_port = "1116",
+      api_key  = "api_key" # https://coinpaprika.com/api/panel/
     },
     coinapi = {
-      # https://github.com/smartcontractkit/external-adapters-js/tree/develop/packages/sources/coinapi
-      version       = "1.1.41", # https://gallery.ecr.aws/chainlink/adapters/coinapi-adapter
-      api_tier_http = "free",
-      alb_port      = "1112",
-      api_key       = "api_key" # https://www.coinapi.io/Account/GetCode
-      ws_enabled    = true
+      # source code:  https://github.com/smartcontractkit/external-adapters-js/tree/develop/packages/sources/coinapi
+      # subscription: https://github.com/smartcontractkit/external-adapters-js/blob/develop/packages/sources/coinapi/src/config/limits.json
+      version  = "1.1.41", # https://gallery.ecr.aws/chainlink/adapters/coinapi-adapter
+      api_tier = "free",
+      alb_port = "1112",
+      api_key  = "api_key" # https://www.coinapi.io/Account/GetCode
     },
     fixer = {
-      # https://github.com/smartcontractkit/external-adapters-js/tree/develop/packages/sources/fixer
-      version       = "1.3.38", # https://gallery.ecr.aws/chainlink/adapters/fixer-adapter
-      api_tier_http = "free",
-      alb_port      = "1130",
-      api_key       = "api_key" # https://fixer.io/
+      # source code:  https://github.com/smartcontractkit/external-adapters-js/tree/develop/packages/sources/fixer
+      # subscription: https://github.com/smartcontractkit/external-adapters-js/blob/develop/packages/sources/fixer/src/config/limits.json
+      version  = "1.3.38", # https://gallery.ecr.aws/chainlink/adapters/fixer-adapter
+      api_tier = "free",
+      alb_port = "1130",
+      api_key  = "api_key" # https://fixer.io/
     },
     currencylayer = {
-      # https://github.com/smartcontractkit/external-adapters-js/tree/develop/packages/sources/currencylayer
-      version       = "1.3.38", # https://gallery.ecr.aws/chainlink/adapters/currencylayer-adapter
-      api_tier_http = "free",
-      alb_port      = "1141",
-      api_key       = "api_key" # https://fixer.io/
+      # source code:  https://github.com/smartcontractkit/external-adapters-js/tree/develop/packages/sources/currencylayer
+      # subscription: https://github.com/smartcontractkit/external-adapters-js/blob/develop/packages/sources/currencylayer/src/config/limits.json
+      version  = "1.3.38", # https://gallery.ecr.aws/chainlink/adapters/currencylayer-adapter
+      api_tier = "free",
+      alb_port = "1141",
+      api_key  = "api_key" # https://fixer.io/
     },
     unibit = {
-      # https://github.com/smartcontractkit/external-adapters-js/tree/develop/packages/sources/unibit
-      version       = "1.3.35", # https://gallery.ecr.aws/chainlink/adapters/unibit-adapter
-      api_tier_http = "freetrial",
-      alb_port      = "1143",
-      api_key       = "api_key" # https://unibit.ai/signin
+      # source code:  https://github.com/smartcontractkit/external-adapters-js/tree/develop/packages/sources/unibit
+      # subscription: https://github.com/smartcontractkit/external-adapters-js/blob/develop/packages/sources/unibit/src/config/limits.json
+      version  = "1.3.35", # https://gallery.ecr.aws/chainlink/adapters/unibit-adapter
+      api_tier = "freetrial",
+      alb_port = "1143",
+      api_key  = "api_key" # https://unibit.ai/signin
     },
     bitex = {
-      # https://github.com/smartcontractkit/external-adapters-js/tree/develop/packages/sources/bitex
-      version       = "1.3.40", # https://gallery.ecr.aws/chainlink/adapters/bitrex-adapter
-      api_tier_http = "free",
-      alb_port      = "1191",
-      api_key       = "" # https://sandbox.bitex.la/
+      # source code:  https://github.com/smartcontractkit/external-adapters-js/tree/develop/packages/sources/bitex
+      # subscription: https://github.com/smartcontractkit/external-adapters-js/blob/develop/packages/sources/bitex/src/config/limits.json
+      version  = "1.3.40", # https://gallery.ecr.aws/chainlink/adapters/bitrex-adapter
+      api_tier = "free",
+      alb_port = "1191",
+      api_key  = "" # https://sandbox.bitex.la/
     },
     intrinio = {
-      # https://github.com/smartcontractkit/external-adapters-js/tree/develop/packages/sources/intrinio
-      version       = "1.2.18", # https://gallery.ecr.aws/chainlink/adapters/intrinio-adapter
-      api_tier_http = "bronze",
-      alb_port      = "1192",
-      api_key       = "api_key" # https://account.intrinio.com/account/api_keys/keys
+      # source code:  https://github.com/smartcontractkit/external-adapters-js/tree/develop/packages/sources/intrinio
+      # subscription: https://github.com/smartcontractkit/external-adapters-js/blob/develop/packages/sources/intrinio/src/config/limits.json
+      version  = "1.2.18", # https://gallery.ecr.aws/chainlink/adapters/intrinio-adapter
+      api_tier = "bronze",
+      alb_port = "1192",
+      api_key  = "api_key" # https://account.intrinio.com/account/api_keys/keys
     },
     nomics = {
-      # https://github.com/smartcontractkit/external-adapters-js/tree/develop/packages/sources/nomics
-      version       = "1.2.11", # https://gallery.ecr.aws/chainlink/adapters/nomics-adapter
-      api_tier_http = "free",
-      alb_port      = "1111",
-      api_key       = "api_key" # https://p.nomics.com/pricing#free-plan
+      # source code:  https://github.com/smartcontractkit/external-adapters-js/tree/develop/packages/sources/nomics
+      # subscription: https://github.com/smartcontractkit/external-adapters-js/blob/develop/packages/sources/nomics/src/config/limits.json
+      version  = "1.2.11", # https://gallery.ecr.aws/chainlink/adapters/nomics-adapter
+      api_tier = "free",
+      alb_port = "1111",
+      api_key  = "api_key" # https://p.nomics.com/pricing#free-plan
     }
   }
 }
