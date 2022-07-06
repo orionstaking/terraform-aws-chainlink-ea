@@ -25,6 +25,19 @@ At the time of writing, the following External Adapters are fully supported and 
 
 All adapters, that available on [chainlink/adapters](https://gallery.ecr.aws/?searchTerm=chainlink%2Fadapters) could be supported as well, but not tested yet.
 
+Terraform module for Chainlink Node: [here](https://github.com/orionterra/terraform-aws-chainlink-node)
+
+## Architecture overview
+
+<img src="./drawio/cl-node-orion.png" width="700">
+
+Where:
+
+- ![#DAE8FC](https://via.placeholder.com/15/DAE8FC/DAE8FC.png) Covered by Chainlink Node terraform [module](https://github.com/orionterra/terraform-aws-chainlink-node)
+- ![#D5E8D4](https://via.placeholder.com/15/D5E8D4/D5E8D4.png) Covered by this Chainlink External Adapters terraform [module](https://github.com/orionterra/terraform-aws-chainlink-ea)
+- ![#D0CEE2](https://via.placeholder.com/15/D0CEE2/D0CEE2.png) Covered by RDS community terraform [module](https://github.com/terraform-aws-modules/terraform-aws-rds-aurora)
+- ![#FFE6CC](https://via.placeholder.com/15/FFE6CC/FFE6CC.png) Covered by VPC community terraform [module](https://github.com/terraform-aws-modules/terraform-aws-vpc)
+
 ## Usage
 
 ### Basic example
