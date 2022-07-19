@@ -44,8 +44,7 @@ Where:
 
 ```hcl
 module "chainlink_ea" {
-  source  = "orionterra/chainlink-ea/aws"
-  version = "1.1.0"
+  source  = "ChainOrion/chainlink-ea/aws"
 
   project     = "example"
   environment = "nonprod"
