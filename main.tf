@@ -1,4 +1,7 @@
 locals {
+
+  # more info about default vars could be found here: https://github.com/smartcontractkit/external-adapters-js/blob/develop/packages/core/bootstrap/README.md 
+  # in order to make more environment variables configurable please create an issue or open a PR
   external_adapters = flatten([
     for key, value in var.external_adapters : [{
       name                     = key
@@ -13,22 +16,22 @@ locals {
       cpu                      = lookup(value, "cpu", 256)
       memory                   = lookup(value, "memory", 512)
       cache_enabled            = lookup(value, "cache_enabled", "true")
-      cache_max_edge           = lookup(value, "cache_max_edge", "61000")
-      cache_redis_timeout      = lookup(value, "cache_redis_timeout", "30000")
+      cache_max_age            = lookup(value, "cache_max_age", "90000")
+      cache_max_items          = lookup(value, "cache_max_items", "1000")
+      cache_redis_timeout      = lookup(value, "cache_redis_timeout", "500")
       rate_limit_enabled       = lookup(value, "rate_limit_enabled", "true")
       warmup_enabled           = lookup(value, "warmup_enabled", "true")
-      timeout                  = lookup(value, "timeout", "30000")
+      api_timeout              = lookup(value, "api_timeout", "30000")
       log_level                = lookup(value, "log_level", "info")
       debug                    = lookup(value, "debug", "false")
       api_verbose              = lookup(value, "api_verbose", "false")
-      external_metrics_enabled = lookup(value, "external_metrics_enabled", "false")
-      retry                    = lookup(value, "retry", "1")
 
-      request_coalescing_enabled              = lookup(value, "request_coalescing_enabled", "true")
+      request_coalescing_enabled              = lookup(value, "request_coalescing_enabled", "false")
       request_coalescing_interval             = lookup(value, "request_coalescing_interval", "100")
       request_coalescing_interval_max         = lookup(value, "request_coalescing_interval_max", "1000")
       request_coalescing_interval_coefficient = lookup(value, "request_coalescing_interval_coefficient", "2")
       request_coalescing_entropy_max          = lookup(value, "request_coalescing_entropy_max", "0")
+      experimental_metrics_enabled            = lookup(value, "experimental_metrics_enabled", "false")
     }]
   ])
 
@@ -70,25 +73,25 @@ data "template_file" "ea_task_definitions" {
     cpu                      = each.value.cpu
     memory                   = each.value.memory
     cache_enabled            = each.value.cache_enabled
-    cache_max_edge           = each.value.cache_max_edge
+    cache_max_age            = each.value.cache_max_age
+    cache_max_items          = each.value.cache_max_items
     cache_redis_host         = aws_memorydb_cluster.this[0].cluster_endpoint[0].address
     cache_redis_port         = aws_memorydb_cluster.this[0].cluster_endpoint[0].port
     cache_type               = "redis"
     cache_redis_timeout      = each.value.cache_redis_timeout
     rate_limit_enabled       = each.value.rate_limit_enabled
     warmup_enabled           = each.value.warmup_enabled
-    timeout                  = each.value.timeout
+    api_timeout              = each.value.api_timeout
     log_level                = each.value.log_level
     debug                    = each.value.debug
     api_verbose              = each.value.api_verbose
-    external_metrics_enabled = each.value.external_metrics_enabled
-    retry                    = each.value.retry
 
     request_coalescing_enabled              = each.value.request_coalescing_enabled
     request_coalescing_interval             = each.value.request_coalescing_interval
     request_coalescing_interval_max         = each.value.request_coalescing_interval_max
     request_coalescing_interval_coefficient = each.value.request_coalescing_interval_coefficient
     request_coalescing_entropy_max          = each.value.request_coalescing_entropy_max
+    experimental_metrics_enabled            = each.value.experimental_metrics_enabled
   }
 }
 

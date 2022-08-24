@@ -12,9 +12,10 @@
       }
     ],
     "environment" : [
-        { "name" : "TIMEOUT", "value" : "${timeout}" },
+        { "name" : "API_TIMEOUT", "value" : "${api_timeout}" },
         { "name" : "CACHE_ENABLED", "value" : "${cache_enabled}" },
-        { "name" : "CACHE_MAX_AGE", "value" : "${cache_max_edge}" },
+        { "name" : "CACHE_MAX_AGE", "value" : "${cache_max_age}" },
+        { "name" : "CACHE_MAX_ITEMS", "value" : "${cache_max_items}" },
         { "name" : "CACHE_TYPE", "value" : "${cache_type}" },
         { "name" : "CACHE_KEY_GROUP", "value" : "${ea_name}" },
         { "name" : "CACHE_REDIS_HOST", "value" : "${cache_redis_host}" },
@@ -33,9 +34,8 @@
         { "name" : "LOG_LEVEL", "value" : "${log_level}" },
         { "name" : "DEBUG", "value" : "${debug}" },
         { "name" : "API_VERBOSE", "value" : "${api_verbose}" },
-        { "name" : "EXPERIMENTAL_METRICS_ENABLED", "value" : "${external_metrics_enabled}" },
-        { "name" : "METRICS_NAME", "value" : "${ea_name}" },
-        { "name" : "RETRY", "value" : "${retry}" }
+        { "name" : "EXPERIMENTAL_METRICS_ENABLED", "value" : "${experimental_metrics_enabled}" },
+        { "name" : "METRICS_NAME", "value" : "${ea_name}" }
       ],
     %{ if api_key != "" }
     "secrets": [
