@@ -57,6 +57,12 @@ variable "ea_desired_task_count" {
   type        = number
 }
 
+variable "cache_redis" {
+  description = "Defines which cache type should be used. Options: local or redis. false means that local cache type should be used for each external adapter. It's possible to use different cache type for different external adapters. To do so set this variable to true to use redis cache by default. Then for specific external adapters set `cache_type` to `local` using `external_adapters` terraform variable"
+  default     = false
+  type        = string
+}
+
 variable "memorydb_node_type" {
   description = "The compute and memory capacity of the nodes in the cluster"
   default     = "db.t4g.small"

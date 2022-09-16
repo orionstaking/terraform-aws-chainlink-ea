@@ -221,7 +221,7 @@ resource "aws_cloudwatch_dashboard" "this" {
       environment    = var.environment
       region         = var.aws_region
       account_id     = var.aws_account_id
-      ea_names       = flatten([ for key, value in var.external_adapters : [ key ] ])
+      ea_names       = flatten([for key, value in var.external_adapters : [key]])
       elb_arn_suffix = aws_lb.this[0].arn_suffix
     }
   )

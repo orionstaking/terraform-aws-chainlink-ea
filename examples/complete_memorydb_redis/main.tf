@@ -41,6 +41,8 @@ module "chainlink_ea" {
   vpc_cidr_block      = module.vpc.vpc_cidr_block
   vpc_private_subnets = module.vpc.private_subnets
 
+  cache_redis = true
+
   external_adapters = {
     coingecko = {
       # source code:  https://github.com/smartcontractkit/external-adapters-js/tree/develop/packages/sources/coingecko

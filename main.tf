@@ -4,27 +4,28 @@ locals {
   # in order to make more environment variables configurable please create an issue or open a PR
   external_adapters = flatten([
     for key, value in var.external_adapters : [{
-      name                     = key
-      custom_task_definition   = lookup(value, "custom", "false")
-      version                  = lookup(value, "version", "latest")
-      api_tier                 = lookup(value, "api_tier", "")
-      api_key                  = lookup(value, "api_key", "")
-      ws_enabled               = lookup(value, "ws_enabled", false)
-      app_port                 = lookup(value, "app_port", 8080)
-      alb_port                 = lookup(value, "alb_port", null)
-      health_path              = lookup(value, "health_path", "/health")
-      cpu                      = lookup(value, "cpu", 256)
-      memory                   = lookup(value, "memory", 512)
-      cache_enabled            = lookup(value, "cache_enabled", "true")
-      cache_max_age            = lookup(value, "cache_max_age", "90000")
-      cache_max_items          = lookup(value, "cache_max_items", "1000")
-      cache_redis_timeout      = lookup(value, "cache_redis_timeout", "500")
-      rate_limit_enabled       = lookup(value, "rate_limit_enabled", "true")
-      warmup_enabled           = lookup(value, "warmup_enabled", "true")
-      api_timeout              = lookup(value, "api_timeout", "30000")
-      log_level                = lookup(value, "log_level", "info")
-      debug                    = lookup(value, "debug", "false")
-      api_verbose              = lookup(value, "api_verbose", "false")
+      name                   = key
+      custom_task_definition = lookup(value, "custom", "false")
+      version                = lookup(value, "version", "latest")
+      api_tier               = lookup(value, "api_tier", "")
+      api_key                = lookup(value, "api_key", "")
+      ws_enabled             = lookup(value, "ws_enabled", false)
+      app_port               = lookup(value, "app_port", 8080)
+      alb_port               = lookup(value, "alb_port", null)
+      health_path            = lookup(value, "health_path", "/health")
+      cpu                    = lookup(value, "cpu", 256)
+      memory                 = lookup(value, "memory", 512)
+      cache_enabled          = lookup(value, "cache_enabled", "true")
+      cache_type             = var.cache_redis ? lookup(value, "cache_type", "redis") : "local"
+      cache_max_age          = lookup(value, "cache_max_age", "90000")
+      cache_max_items        = lookup(value, "cache_max_items", "1000")
+      cache_redis_timeout    = lookup(value, "cache_redis_timeout", "500")
+      rate_limit_enabled     = lookup(value, "rate_limit_enabled", "true")
+      warmup_enabled         = lookup(value, "warmup_enabled", "true")
+      api_timeout            = lookup(value, "api_timeout", "30000")
+      log_level              = lookup(value, "log_level", "info")
+      debug                  = lookup(value, "debug", "false")
+      api_verbose            = lookup(value, "api_verbose", "false")
 
       request_coalescing_enabled              = lookup(value, "request_coalescing_enabled", "false")
       request_coalescing_interval             = lookup(value, "request_coalescing_interval", "100")
@@ -61,30 +62,30 @@ data "template_file" "ea_task_definitions" {
   )
 
   vars = {
-    project                  = var.project
-    environment              = var.environment
-    ea_name                  = each.value.name
-    api_tier                 = each.value.api_tier
-    api_key                  = each.value.api_key != "" ? aws_secretsmanager_secret.api_key_obj[each.value.name].arn : ""
-    ws_enabled               = each.value.ws_enabled
-    docker_image             = "public.ecr.aws/chainlink/adapters/${each.value.name}-adapter:${each.value.version}"
-    aws_region               = var.aws_region
-    port                     = each.value.app_port
-    cpu                      = each.value.cpu
-    memory                   = each.value.memory
-    cache_enabled            = each.value.cache_enabled
-    cache_max_age            = each.value.cache_max_age
-    cache_max_items          = each.value.cache_max_items
-    cache_redis_host         = aws_memorydb_cluster.this[0].cluster_endpoint[0].address
-    cache_redis_port         = aws_memorydb_cluster.this[0].cluster_endpoint[0].port
-    cache_type               = "redis"
-    cache_redis_timeout      = each.value.cache_redis_timeout
-    rate_limit_enabled       = each.value.rate_limit_enabled
-    warmup_enabled           = each.value.warmup_enabled
-    api_timeout              = each.value.api_timeout
-    log_level                = each.value.log_level
-    debug                    = each.value.debug
-    api_verbose              = each.value.api_verbose
+    project             = var.project
+    environment         = var.environment
+    ea_name             = each.value.name
+    api_tier            = each.value.api_tier
+    api_key             = each.value.api_key != "" ? aws_secretsmanager_secret.api_key_obj[each.value.name].arn : ""
+    ws_enabled          = each.value.ws_enabled
+    docker_image        = "public.ecr.aws/chainlink/adapters/${each.value.name}-adapter:${each.value.version}"
+    aws_region          = var.aws_region
+    port                = each.value.app_port
+    cpu                 = each.value.cpu
+    memory              = each.value.memory
+    cache_enabled       = each.value.cache_enabled
+    cache_type          = each.value.cache_type
+    cache_max_age       = each.value.cache_max_age
+    cache_max_items     = each.value.cache_max_items
+    cache_redis_host    = each.value.cache_type == "redis" ? aws_memorydb_cluster.this[0].cluster_endpoint[0].address : ""
+    cache_redis_port    = each.value.cache_type == "redis" ? aws_memorydb_cluster.this[0].cluster_endpoint[0].port : ""
+    cache_redis_timeout = each.value.cache_type == "redis" ? each.value.cache_redis_timeout : ""
+    rate_limit_enabled  = each.value.rate_limit_enabled
+    warmup_enabled      = each.value.warmup_enabled
+    api_timeout         = each.value.api_timeout
+    log_level           = each.value.log_level
+    debug               = each.value.debug
+    api_verbose         = each.value.api_verbose
 
     request_coalescing_enabled              = each.value.request_coalescing_enabled
     request_coalescing_interval             = each.value.request_coalescing_interval
@@ -124,8 +125,11 @@ resource "aws_ecs_service" "this" {
   desired_count = var.ea_desired_task_count
 
   network_configuration {
-    subnets          = var.vpc_private_subnets
-    security_groups  = [aws_security_group.tasks_sg[0].id, aws_security_group.memorydb_sg[0].id]
+    subnets = var.vpc_private_subnets
+    security_groups = (var.cache_redis && each.value.cache_type == "redis" ?
+      [aws_security_group.tasks_sg[0].id, aws_security_group.memorydb_sg[0].id] :
+      [aws_security_group.tasks_sg[0].id]
+    )
     assign_public_ip = false
   }
 

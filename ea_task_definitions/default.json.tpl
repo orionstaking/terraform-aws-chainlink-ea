@@ -18,9 +18,11 @@
         { "name" : "CACHE_MAX_ITEMS", "value" : "${cache_max_items}" },
         { "name" : "CACHE_TYPE", "value" : "${cache_type}" },
         { "name" : "CACHE_KEY_GROUP", "value" : "${ea_name}" },
+        %{ if cache_type == "redis" }
         { "name" : "CACHE_REDIS_HOST", "value" : "${cache_redis_host}" },
         { "name" : "CACHE_REDIS_PORT", "value" : "${cache_redis_port}" },
         { "name" : "CACHE_REDIS_TIMEOUT", "value" : "${cache_redis_timeout}" },
+        %{ endif }
         { "name" : "RATE_LIMIT_ENABLED", "value" : "${rate_limit_enabled}" },
         { "name" : "WARMUP_ENABLED", "value" : "${warmup_enabled}" },
         { "name" : "RATE_LIMIT_API_PROVIDER", "value" : "${ea_name}" },

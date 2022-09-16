@@ -71,6 +71,7 @@ module "chainlink_ea" {
 List of Chainlink EA's supported environment variables that could be specified using `external_adapters` variable.
   - timeout
   - cache_enabled
+  - cache_type
   - cache_max_age
   - cache_redis_timeout
   - rate_limit_enabled
@@ -177,6 +178,7 @@ No modules.
 |------|-------------|------|---------|:--------:|
 | <a name="input_aws_account_id"></a> [aws\_account\_id](#input\_aws\_account\_id) | AWS account id. Used to add alarms to dashboard | `string` | n/a | yes |
 | <a name="input_aws_region"></a> [aws\_region](#input\_aws\_region) | AWS Region (required for CloudWatch logs configuration) | `string` | n/a | yes |
+| <a name="input_cache_redis"></a> [cache\_redis](#input\_cache\_redis) | Defines which cache type should be used. Options: local or redis. false means that local cache type should be used for each external adapter. It's possible to use different cache type for different external adapters. To do so set this variable to true to use redis cache by default. Then for specific external adapters set `cache_type` to `local` using `external_adapters` terraform variable | `string` | `false` | no |
 | <a name="input_ea_desired_task_count"></a> [ea\_desired\_task\_count](#input\_ea\_desired\_task\_count) | Number of instances of the task definition to place and keep running | `number` | `1` | no |
 | <a name="input_environment"></a> [environment](#input\_environment) | Environment name | `string` | `"nonprod"` | no |
 | <a name="input_external_adapters"></a> [external\_adapters](#input\_external\_adapters) | n/a | `map` | `{}` | no |
