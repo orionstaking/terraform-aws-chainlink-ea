@@ -33,6 +33,20 @@ locals {
       request_coalescing_interval_coefficient = lookup(value, "request_coalescing_interval_coefficient", "2")
       request_coalescing_entropy_max          = lookup(value, "request_coalescing_entropy_max", "0")
       experimental_metrics_enabled            = lookup(value, "experimental_metrics_enabled", "false")
+
+      ea_specific_variables = flatten([
+        for spec_var_key, spec_var_value in lookup(value, "ea_specific_variables", {}) : [{
+          name  = spec_var_key
+          value = spec_var_value
+        }]
+      ])
+
+      ea_specific_secret_variables = flatten([
+        for spec_sec_var_key, spec_sec_var_value in lookup(value, "ea_specific_secret_variables", {}) : [{
+          secret_name  = spec_sec_var_key
+          secret_value = spec_sec_var_value
+        }]
+      ])
     }]
   ])
 
@@ -52,50 +66,6 @@ resource "aws_ecs_cluster" "this" {
   }
 }
 
-# ECS task definitions
-data "template_file" "ea_task_definitions" {
-  for_each = { for ea in local.external_adapters : ea.name => ea if local.create }
-
-  template = (each.value.custom_task_definition == "true" ?
-    file("${path.module}/ea_task_definitions/${each.value.name}.json.tpl") :
-    file("${path.module}/ea_task_definitions/default.json.tpl")
-  )
-
-  vars = {
-    project             = var.project
-    environment         = var.environment
-    ea_name             = each.value.name
-    api_tier            = each.value.api_tier
-    api_key             = each.value.api_key != "" ? aws_secretsmanager_secret.api_key_obj[each.value.name].arn : ""
-    ws_enabled          = each.value.ws_enabled
-    docker_image        = "public.ecr.aws/chainlink/adapters/${each.value.name}-adapter:${each.value.version}"
-    aws_region          = var.aws_region
-    port                = each.value.app_port
-    cpu                 = each.value.cpu
-    memory              = each.value.memory
-    cache_enabled       = each.value.cache_enabled
-    cache_type          = each.value.cache_type
-    cache_max_age       = each.value.cache_max_age
-    cache_max_items     = each.value.cache_max_items
-    cache_redis_host    = each.value.cache_type == "redis" ? aws_memorydb_cluster.this[0].cluster_endpoint[0].address : ""
-    cache_redis_port    = each.value.cache_type == "redis" ? aws_memorydb_cluster.this[0].cluster_endpoint[0].port : ""
-    cache_redis_timeout = each.value.cache_type == "redis" ? each.value.cache_redis_timeout : ""
-    rate_limit_enabled  = each.value.rate_limit_enabled
-    warmup_enabled      = each.value.warmup_enabled
-    api_timeout         = each.value.api_timeout
-    log_level           = each.value.log_level
-    debug               = each.value.debug
-    api_verbose         = each.value.api_verbose
-
-    request_coalescing_enabled              = each.value.request_coalescing_enabled
-    request_coalescing_interval             = each.value.request_coalescing_interval
-    request_coalescing_interval_max         = each.value.request_coalescing_interval_max
-    request_coalescing_interval_coefficient = each.value.request_coalescing_interval_coefficient
-    request_coalescing_entropy_max          = each.value.request_coalescing_entropy_max
-    experimental_metrics_enabled            = each.value.experimental_metrics_enabled
-  }
-}
-
 resource "aws_ecs_task_definition" "this" {
   for_each = { for ea in local.external_adapters : ea.name => ea if local.create }
 
@@ -108,7 +78,46 @@ resource "aws_ecs_task_definition" "this" {
 
   execution_role_arn = aws_iam_role.this[0].arn
 
-  container_definitions = data.template_file.ea_task_definitions[each.value.name].rendered
+  # container_definitions = data.template_file.ea_task_definitions[each.value.name].rendered
+  container_definitions = templatefile(
+    "${path.module}/ea_task_definitions/default.json.tpl",
+    {
+      project             = var.project
+      environment         = var.environment
+      ea_name             = each.value.name
+      api_tier            = each.value.api_tier
+      api_key             = each.value.api_key != "" ? aws_secretsmanager_secret.api_key_obj[each.value.name].arn : ""
+      ws_enabled          = each.value.ws_enabled
+      docker_image        = "public.ecr.aws/chainlink/adapters/${each.value.name}-adapter:${each.value.version}"
+      aws_region          = var.aws_region
+      port                = each.value.app_port
+      cpu                 = each.value.cpu
+      memory              = each.value.memory
+      cache_enabled       = each.value.cache_enabled
+      cache_type          = each.value.cache_type
+      cache_max_age       = each.value.cache_max_age
+      cache_max_items     = each.value.cache_max_items
+      cache_redis_host    = each.value.cache_type == "redis" ? aws_memorydb_cluster.this[0].cluster_endpoint[0].address : ""
+      cache_redis_port    = each.value.cache_type == "redis" ? aws_memorydb_cluster.this[0].cluster_endpoint[0].port : ""
+      cache_redis_timeout = each.value.cache_type == "redis" ? each.value.cache_redis_timeout : ""
+      rate_limit_enabled  = each.value.rate_limit_enabled
+      warmup_enabled      = each.value.warmup_enabled
+      api_timeout         = each.value.api_timeout
+      log_level           = each.value.log_level
+      debug               = each.value.debug
+      api_verbose         = each.value.api_verbose
+
+      request_coalescing_enabled              = each.value.request_coalescing_enabled
+      request_coalescing_interval             = each.value.request_coalescing_interval
+      request_coalescing_interval_max         = each.value.request_coalescing_interval_max
+      request_coalescing_interval_coefficient = each.value.request_coalescing_interval_coefficient
+      request_coalescing_entropy_max          = each.value.request_coalescing_entropy_max
+      experimental_metrics_enabled            = each.value.experimental_metrics_enabled
+
+      ea_specific_variables        = each.value.ea_specific_variables
+      ea_specific_secret_variables = module.ea_specific_secrets[each.value.name].secrets
+    }
+  )
 }
 
 # ECS service
