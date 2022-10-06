@@ -40,18 +40,6 @@ variable "external_adapters" {
   type        = any
 }
 
-variable "tfstate_secrets_store" {
-  description = "Defines whether to store EA's secrets in plane text in terraform store or not. If 'true', secrets for EA should be specified in external_adapters var. If 'false', it is recommended to run the module with 'initialize' variabe equals to 'true' to set the secrets manually in AWS Secrets Manager"
-  default     = true
-  type        = bool
-}
-
-variable "secret_objects_only" {
-  description = "If 'true' and 'tfstate_secrets_store' is 'false', 'terraform apply' will create only AWS Secrets Manager objects to store API keys for EA's. Once all required secrets will be set manually, set this var to 'true' to create remaining AWS infra to run EA's"
-  default     = false
-  type        = bool
-}
-
 variable "ea_desired_task_count" {
   description = "Number of instances of the task definition to place and keep running"
   default     = 1

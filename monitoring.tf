@@ -1,13 +1,13 @@
 # SNS topic for alerts if custom not specified
 resource "aws_sns_topic" "this" {
-  count = local.create && var.monitoring_enabled && var.sns_topic_arn == "" ? 1 : 0
+  count = var.monitoring_enabled && var.sns_topic_arn == "" ? 1 : 0
 
   name = "${var.project}-${var.environment}-ea"
 }
 
 # Log errors to Metrics transformation
 resource "aws_cloudwatch_log_metric_filter" "log_errors" {
-  for_each = { for ea in local.external_adapters : ea.name => ea if local.create && var.monitoring_enabled }
+  for_each = { for ea in local.external_adapters : ea.name => ea if var.monitoring_enabled }
 
   name           = "${var.project}-${var.environment}-${each.value.name}"
   pattern        = "error"
@@ -23,7 +23,7 @@ resource "aws_cloudwatch_log_metric_filter" "log_errors" {
 
 # Alarms based on logs
 resource "aws_cloudwatch_metric_alarm" "log_alarms" {
-  for_each = { for ea in local.external_adapters : ea.name => ea if local.create && var.monitoring_enabled }
+  for_each = { for ea in local.external_adapters : ea.name => ea if var.monitoring_enabled }
 
   alarm_name          = "${var.project}-${var.environment}-ea-${each.value.name}-log-error"
   comparison_operator = "GreaterThanThreshold"
@@ -42,7 +42,7 @@ resource "aws_cloudwatch_metric_alarm" "log_alarms" {
 
 # metric alarms
 resource "aws_cloudwatch_metric_alarm" "memory_utilization" {
-  for_each = { for ea in local.external_adapters : ea.name => ea if local.create && var.monitoring_enabled }
+  for_each = { for ea in local.external_adapters : ea.name => ea if var.monitoring_enabled }
 
   alarm_name          = "${var.project}-${var.environment}-ea-${each.value.name}-MemoryUtilizationHigh"
   comparison_operator = "GreaterThanThreshold"
@@ -94,7 +94,7 @@ resource "aws_cloudwatch_metric_alarm" "memory_utilization" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "cpu_utilization" {
-  for_each = { for ea in local.external_adapters : ea.name => ea if local.create && var.monitoring_enabled }
+  for_each = { for ea in local.external_adapters : ea.name => ea if var.monitoring_enabled }
 
   alarm_name          = "${var.project}-${var.environment}-ea-${each.value.name}-CPUUtilizationHigh"
   comparison_operator = "GreaterThanThreshold"
@@ -146,7 +146,7 @@ resource "aws_cloudwatch_metric_alarm" "cpu_utilization" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "elb" {
-  for_each = local.create && var.monitoring_enabled ? toset(["4XX", "5XX"]) : []
+  for_each = var.monitoring_enabled ? toset(["4XX", "5XX"]) : []
 
   alarm_name          = "${var.project}-${var.environment}-ea-elb-${each.key}"
   comparison_operator = "GreaterThanThreshold"
@@ -163,12 +163,12 @@ resource "aws_cloudwatch_metric_alarm" "elb" {
   ok_actions          = var.sns_topic_arn == "" ? [aws_sns_topic.this[0].arn] : [var.sns_topic_arn]
 
   dimensions = {
-    LoadBalancer = aws_lb.this[0].arn_suffix
+    LoadBalancer = aws_lb.this.arn_suffix
   }
 }
 
 resource "aws_cloudwatch_metric_alarm" "memorydb_cpu" {
-  count = local.create && var.monitoring_enabled ? 1 : 0
+  count = var.monitoring_enabled ? 1 : 0
 
   alarm_name          = "${var.project}-${var.environment}-ea-memorydb-CPUUtilization"
   comparison_operator = "GreaterThanThreshold"
@@ -189,7 +189,7 @@ resource "aws_cloudwatch_metric_alarm" "memorydb_cpu" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "memorydb_memory" {
-  count = local.create && var.monitoring_enabled ? 1 : 0
+  count = var.monitoring_enabled ? 1 : 0
 
   alarm_name          = "${var.project}-${var.environment}-ea-memorydb-DatabaseMemoryUsagePercentage"
   comparison_operator = "GreaterThanThreshold"
@@ -210,7 +210,7 @@ resource "aws_cloudwatch_metric_alarm" "memorydb_memory" {
 }
 
 resource "aws_cloudwatch_dashboard" "this" {
-  count = local.create && var.monitoring_enabled ? 1 : 0
+  count = var.monitoring_enabled ? 1 : 0
 
   dashboard_name = "${var.project}-${var.environment}-ea"
   # dashboard_body = data.template_file.adapters[0].rendered
@@ -222,7 +222,7 @@ resource "aws_cloudwatch_dashboard" "this" {
       region         = var.aws_region
       account_id     = var.aws_account_id
       ea_names       = flatten([for key, value in var.external_adapters : [key]])
-      elb_arn_suffix = aws_lb.this[0].arn_suffix
+      elb_arn_suffix = aws_lb.this.arn_suffix
     }
   )
 }

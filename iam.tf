@@ -1,7 +1,5 @@
 # ECS execution role with access to ECR and Cloudwatch
 data "aws_iam_policy_document" "this" {
-  count = local.create ? 1 : 0
-
   statement {
     effect = "Allow"
     actions = [
@@ -43,16 +41,12 @@ data "aws_iam_policy_document" "this" {
 }
 
 resource "aws_iam_policy" "this" {
-  count = local.create ? 1 : 0
-
   name        = "${var.project}-${var.environment}-ea-task-exec-policy"
   description = "Provides access to ECR and Cloudwatch logs"
-  policy      = data.aws_iam_policy_document.this[0].json
+  policy      = data.aws_iam_policy_document.this.json
 }
 
 resource "aws_iam_role" "this" {
-  count = local.create ? 1 : 0
-
   name = "${var.project}-${var.environment}-ea-ecs-tasks"
 
   assume_role_policy = <<EOF
@@ -73,8 +67,6 @@ EOF
 }
 
 resource "aws_iam_role_policy_attachment" "this" {
-  count = local.create ? 1 : 0
-
-  policy_arn = aws_iam_policy.this[0].arn
-  role       = aws_iam_role.this[0].name
+  policy_arn = aws_iam_policy.this.arn
+  role       = aws_iam_role.this.name
 }

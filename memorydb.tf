@@ -1,19 +1,19 @@
 resource "aws_memorydb_parameter_group" "this" {
-  count = local.create && var.cache_redis ? 1 : 0
+  count = var.cache_redis ? 1 : 0
 
   name   = "${var.project}-${var.environment}-ea"
   family = "memorydb_redis6"
 }
 
 resource "aws_memorydb_subnet_group" "this" {
-  count = local.create && var.cache_redis ? 1 : 0
+  count = var.cache_redis ? 1 : 0
 
   name       = "${var.project}-${var.environment}-ea"
   subnet_ids = var.vpc_private_subnets
 }
 
 resource "aws_memorydb_cluster" "this" {
-  count = local.create && var.cache_redis ? 1 : 0
+  count = var.cache_redis ? 1 : 0
 
   acl_name                 = "open-access"
   tls_enabled              = false
@@ -31,7 +31,7 @@ resource "aws_memorydb_cluster" "this" {
 
 # SG for MemoryDB
 resource "aws_security_group" "memorydb_sg" {
-  count = local.create && var.cache_redis ? 1 : 0
+  count = var.cache_redis ? 1 : 0
 
   name        = "${var.project}-${var.environment}-ea-memorydb"
   description = "Allow trafic to redis memoryDB from VPC"
@@ -39,7 +39,7 @@ resource "aws_security_group" "memorydb_sg" {
 }
 
 resource "aws_security_group_rule" "ingress_mem_allow_self" {
-  count = local.create && var.cache_redis ? 1 : 0
+  count = var.cache_redis ? 1 : 0
 
   type      = "ingress"
   from_port = 0
@@ -51,7 +51,7 @@ resource "aws_security_group_rule" "ingress_mem_allow_self" {
 }
 
 resource "aws_security_group_rule" "egress_mem_allow_all" {
-  count = local.create && var.cache_redis ? 1 : 0
+  count = var.cache_redis ? 1 : 0
 
   type        = "egress"
   from_port   = 0
