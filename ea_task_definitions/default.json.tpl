@@ -36,11 +36,20 @@
         { "name" : "LOG_LEVEL", "value" : "${log_level}" },
         { "name" : "DEBUG", "value" : "${debug}" },
         { "name" : "API_VERBOSE", "value" : "${api_verbose}" },
+        %{~ for definition in ea_specific_variables ~}
+        { "name" : "${definition.name}", "value" : "${definition.value}" },
+        %{~ endfor ~}
         { "name" : "EXPERIMENTAL_METRICS_ENABLED", "value" : "${experimental_metrics_enabled}" },
         { "name" : "METRICS_NAME", "value" : "${ea_name}" }
       ],
     %{ if api_key != "" }
     "secrets": [
+      %{~ for secret in ea_specific_secret_variables ~}
+      {
+        "name": "${secret.name}",
+        "valueFrom": "${secret.valueFrom}"
+      },
+      %{~ endfor ~}
       {
         "name": "API_KEY",
         "valueFrom": "${api_key}"

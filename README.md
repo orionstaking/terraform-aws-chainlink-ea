@@ -22,6 +22,8 @@ At the time of writing, the following External Adapters are fully supported and 
   - bitex
   - intrinio
   - nomics
+  - jpegd
+  - bank-frick
 
 All adapters, that available on [chainlink/adapters](https://gallery.ecr.aws/?searchTerm=chainlink%2Fadapters) could be supported as well, but not tested yet.
 
@@ -89,16 +91,27 @@ List of Chainlink EA's supported environment variables that could be specified u
 
 ## Notes
 
-### AWS SM without storing secrets in terraform state in plain text (!OPTIONAL)
+### AWS Secrets Manager
 
-! Only when running from scratch. Setting `secret_objects_only` equals `true` when adding a new adapter to the list will lead to AWS Chainlink EA's infra destruction (Fargate cluster, MemoryDB, etc.)
+AWS Secrets Manager is used to keep all secret values required for an External Adapter.
 
-There is an ability to create empty AWS Secrets Manager object for API key when running for the first time. Then, you will need to manyally update the secrets with API key values. This action will prevent storing secrets in terraform state in plain text.
+#### AWS SM without storing secrets in terraform state in plain text (!OPTIONAL)
+
+There is an ability to create empty AWS Secrets Manager objects that will be connected to ECS Fargate task. This action will prevent storing secrets in terraform state files in plain text.
 
 The list of required actions:
-  - run `terraform apply` with `secret_objects_only` equals `true` and `tfstate_secrets_store` equals `false` to create emtpy AWS SM objects for API keys storing.
+  - Leave all secrets related veriables with an empty string like `""`. The list of secrets related variables: `api_key` and all variables from `ea_specific_secret_variables`. Check an exhausive example in .examples/complete_secrets folder.
+  - Run `terraform apply`
   - Manually update created AWS SM objects (using AWS Console/CLI/etc.)
-  - run `terraform apply` once again with `secret_objects_only` equals `false` and `tfstate_secrets_store` equals `false`
+  - Restart related External Adapters in ECS (using AWS Console/CLI/etc.) to update them with new values from AWS SM objects.
+
+#### Additional (non default) secrets required for an External Adapter
+
+In most cases all External adapters are needed to store only API_KEY environment variable in AWS SM.
+
+Sometimes, an External Adapter like [bank-frick](https://github.com/smartcontractkit/external-adapters-js/tree/develop/packages/sources/bank-frick) is required more sensetive variables than just API_KEY. In this case, it's possible to include all required values in `ea_specific_secret_variables` block in `external_adapters` variable.
+
+Check an exhausive example in .examples/complete_secrets folder.
 
 ### Usage of custom task definition file (when default template is not enough)
 
@@ -111,7 +124,9 @@ The list of required actions:
 
 ## Examples
 
+- [Basic example with local cache](./examples/basic_local_cache/main.tf)
 - [Complete example with MemoryDB](./examples/complete_memorydb_redis/main.tf)
+- [Basic example with AWS SM usage](./examples/basic_specific_secrets/main.tf)
 
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
@@ -126,11 +141,12 @@ The list of required actions:
 | Name | Version |
 |------|---------|
 | <a name="provider_aws"></a> [aws](#provider\_aws) | >= 4.12.0 |
-| <a name="provider_template"></a> [template](#provider\_template) | n/a |
 
 ## Modules
 
-No modules.
+| Name | Source | Version |
+|------|--------|---------|
+| <a name="module_ea_specific_secrets"></a> [ea\_specific\_secrets](#module\_ea\_specific\_secrets) | ./modules/ea_specific_secrets | n/a |
 
 ## Resources
 
@@ -170,7 +186,6 @@ No modules.
 | [aws_security_group_rule.ingress_mem_allow_self](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) | resource |
 | [aws_sns_topic.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/sns_topic) | resource |
 | [aws_iam_policy_document.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
-| [template_file.ea_task_definitions](https://registry.terraform.io/providers/hashicorp/template/latest/docs/data-sources/file) | data source |
 
 ## Inputs
 
@@ -181,16 +196,14 @@ No modules.
 | <a name="input_cache_redis"></a> [cache\_redis](#input\_cache\_redis) | Defines which cache type should be used. Options: local or redis. false means that local cache type should be used for each external adapter. It's possible to use different cache type for different external adapters. To do so set this variable to true to use redis cache by default. Then for specific external adapters set `cache_type` to `local` using `external_adapters` terraform variable | `string` | `false` | no |
 | <a name="input_ea_desired_task_count"></a> [ea\_desired\_task\_count](#input\_ea\_desired\_task\_count) | Number of instances of the task definition to place and keep running | `number` | `1` | no |
 | <a name="input_environment"></a> [environment](#input\_environment) | Environment name | `string` | `"nonprod"` | no |
-| <a name="input_external_adapters"></a> [external\_adapters](#input\_external\_adapters) | n/a | `map` | `{}` | no |
+| <a name="input_external_adapters"></a> [external\_adapters](#input\_external\_adapters) | Map of external adapters that needs to be deployed. See example in ./examples/complete\_memorydb\_redis | `any` | `{}` | no |
 | <a name="input_memorydb_node_type"></a> [memorydb\_node\_type](#input\_memorydb\_node\_type) | The compute and memory capacity of the nodes in the cluster | `string` | `"db.t4g.small"` | no |
 | <a name="input_memorydb_num_replicas_per_shard"></a> [memorydb\_num\_replicas\_per\_shard](#input\_memorydb\_num\_replicas\_per\_shard) | The number of replicas to apply to each shard, up to a maximum of 5 | `number` | `0` | no |
 | <a name="input_memorydb_shards_count"></a> [memorydb\_shards\_count](#input\_memorydb\_shards\_count) | The number of shards in the cluster | `number` | `1` | no |
 | <a name="input_memorydb_snapshot_retention_limit"></a> [memorydb\_snapshot\_retention\_limit](#input\_memorydb\_snapshot\_retention\_limit) | The number of days for which MemoryDB retains automatic snapshots before deleting them. When set to 0, automatic backups are disabled | `number` | `0` | no |
 | <a name="input_monitoring_enabled"></a> [monitoring\_enabled](#input\_monitoring\_enabled) | Defines whether to create CloudWatch dashboard and custom metrics or not | `bool` | `true` | no |
 | <a name="input_project"></a> [project](#input\_project) | Project name | `string` | n/a | yes |
-| <a name="input_secret_objects_only"></a> [secret\_objects\_only](#input\_secret\_objects\_only) | If 'true' and 'tfstate\_secrets\_store' is 'false', 'terraform apply' will create only AWS Secrets Manager objects to store API keys for EA's. Once all required secrets will be set manually, set this var to 'true' to create remaining AWS infra to run EA's | `bool` | `false` | no |
 | <a name="input_sns_topic_arn"></a> [sns\_topic\_arn](#input\_sns\_topic\_arn) | SNS topic arn for alerts. If not specified, module will create an empty topic and provide topic arn in the output. Then it will be possible to specify required notification method for this topic | `string` | `""` | no |
-| <a name="input_tfstate_secrets_store"></a> [tfstate\_secrets\_store](#input\_tfstate\_secrets\_store) | Defines whether to store EA's secrets in plane text in terraform store or not. If 'true', secrets for EA should be specified in external\_adapters var. If 'false', it is recommended to run the module with 'initialize' variabe equals to 'true' to set the secrets manually in AWS Secrets Manager | `bool` | `true` | no |
 | <a name="input_vpc_cidr_block"></a> [vpc\_cidr\_block](#input\_vpc\_cidr\_block) | The CIDR block of the VPC | `string` | n/a | yes |
 | <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id) | ID of the VPC where Chainlink EAs should be deployed | `string` | n/a | yes |
 | <a name="input_vpc_private_subnets"></a> [vpc\_private\_subnets](#input\_vpc\_private\_subnets) | VPC private subnets where Chainlink EAs should be deployed (at least 2) | `list(any)` | n/a | yes |
