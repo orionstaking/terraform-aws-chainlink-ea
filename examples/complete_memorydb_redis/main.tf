@@ -7,7 +7,6 @@ provider "aws" {
       Project     = "example"
       Chains      = "Ethereum"
       TF_MANAGED  = "true"
-      TF_VERSION  = "1.1.7"
       TF_SERVICE  = "chainlink_ea"
     }
   }
@@ -55,7 +54,12 @@ module "chainlink_ea" {
       memory      = 512,
       log_level   = "info",
       health_path = "/health",
-      timeout     = "30000"
+      timeout     = "30000",
+
+      ea_specific_variables = {
+        SPECIFIC_VAR_KEY_1 = "SPECIFIC_VAR_VALUE_1",
+        SPECIFIC_VAR_KEY_1 = "SPECIFIC_VAR_VALUE_2"
+      }
       # full list in main README.md
     },
     tiingo = {

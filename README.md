@@ -124,7 +124,9 @@ The list of required actions:
 
 ## Examples
 
+- [Basic example with local cache](./examples/basic_local_cache/main.tf)
 - [Complete example with MemoryDB](./examples/complete_memorydb_redis/main.tf)
+- [Basic example with AWS SM usage](./examples/basic_specific_secrets/main.tf)
 
 <!-- BEGIN_TF_DOCS -->
 ## Requirements

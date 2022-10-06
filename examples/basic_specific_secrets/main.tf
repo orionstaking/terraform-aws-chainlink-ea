@@ -42,23 +42,27 @@ module "chainlink_ea" {
 
   external_adapters = {
     coingecko = {
-      # source code:  https://github.com/smartcontractkit/external-adapters-js/tree/develop/packages/sources/coingecko
-      # subscription: https://github.com/smartcontractkit/external-adapters-js/blob/develop/packages/sources/coingecko/src/config/limits.json
-      version     = "1.6.7", # https://gallery.ecr.aws/chainlink/adapters/coingecko-adapter
+      version     = "1.6.7",
       api_tier    = "analyst",
       alb_port    = "1113",
-      api_key     = "api_key", # https://www.coingecko.com/en/developers/dashboard
-      cpu         = 256,
-      memory      = 512,
-      log_level   = "info",
-      health_path = "/health",
-      timeout     = "30000",
+      api_key     = "API_KEY_VALUE", # Value of AWS SM object will be set to "API_KEY_VALUE"
 
-      ea_specific_variables = {
-        SPECIFIC_VAR_KEY_1 = "SPECIFIC_VAR_VALUE_1",
-        SPECIFIC_VAR_KEY_1 = "SPECIFIC_VAR_VALUE_2"
+      ea_specific_secret_variables = {
+        SECRET_VAR_KEY = "SECRET_VAR_VALUE" # Value of AWS SM object will be set to "SECRET_VAR_VALUE"
       }
-      # full list in main README.md
+    },
+    bank-frick = {
+      version  = "0.0.7",
+      api_tier = "production",
+      alb_port = "1182",
+      api_key  = "" # Value of AWS SM object won't be set. You'll need to set a value manually
+      ea_specific_variables = {
+        PAGE_SIZE    = "500",
+        API_ENDPOINT = "API_ENDPOINT_VALUE"
+      }
+      ea_specific_secret_variables = {
+        PRIVATE_KEY = "" # Value of AWS SM object won't be set. You'll need to set a value manually
+      }
     }
   }
 }
