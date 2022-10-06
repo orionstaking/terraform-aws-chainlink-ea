@@ -35,8 +35,9 @@ variable "vpc_private_subnets" {
 }
 
 variable "external_adapters" {
-  description = ""
+  description = "Map of external adapters that needs to be deployed. See example in ./examples/complete_memorydb_redis"
   default     = {}
+  type        = any
 }
 
 variable "tfstate_secrets_store" {

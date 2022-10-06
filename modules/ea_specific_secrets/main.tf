@@ -1,3 +1,4 @@
+# Creation of EA specific secrets and setting value if secret ins't empty
 resource "aws_secretsmanager_secret" "this" {
   for_each = { for secret in var.secrets : secret.secret_name => secret }
 
@@ -14,7 +15,7 @@ resource "aws_secretsmanager_secret_version" "this" {
   secret_string = each.value.secret_value
 }
 
-# ECS execution role with access to ECR and Cloudwatch
+# IAM policy that will be connected to ECS execution policy to access EA specific secrets
 data "aws_iam_policy_document" "this" {
   count = var.secrets != [] ? 1 : 0
 
