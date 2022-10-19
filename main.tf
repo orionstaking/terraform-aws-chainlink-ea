@@ -110,7 +110,7 @@ resource "aws_ecs_task_definition" "this" {
       experimental_metrics_enabled            = each.value.experimental_metrics_enabled
 
       ea_specific_variables = each.value.ea_specific_variables
-      ea_secret_variables   = module.ea_specific_secrets[each.value.name].secrets
+      ea_secret_variables   = module.ea_secrets[each.value.name].secrets
     }
   )
 }

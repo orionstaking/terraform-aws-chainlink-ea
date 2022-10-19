@@ -1,7 +1,7 @@
 # AWS SecretsManager objects for Chainlink EA's
-module "ea_specific_secrets" {
+module "ea_secrets" {
   for_each = { for ea in local.external_adapters : ea.name => ea }
-  source   = "./modules/ea_specific_secrets"
+  source   = "./modules/ea_secrets"
 
   project     = var.project
   environment = var.environment
