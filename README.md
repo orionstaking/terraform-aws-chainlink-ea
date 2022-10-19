@@ -3,7 +3,7 @@
 Terraform module which creates AWS infra for Chainlink External Adapters:
   - AWS Fargate
   - AWS Application Load Balancer
-  - AWS Secrets Manager (to store API keys)
+  - AWS Secrets Manager (to store API keys and other secrets)
   - AWS IAM
   - AWS MemoryDB (to enable Redis cache)
   - AWS CloudWatch
@@ -61,10 +61,12 @@ module "chainlink_ea" {
   # Examples for all supprted and tested adapters could be found in ./examples/complete_memorydb_redis
   external_adapters = {
     coingecko = {
-      version  = "1.6.7",
-      api_tier = "analyst",
-      alb_port = "1113",
-      api_key  = "api_key"
+      version  = "1.6.7"
+      api_tier = "analyst"
+      alb_port = "1113"
+      ea_secret_variables = {
+        API_KEY = "api_key" # if reqired by EA
+      }
     }
   }
 }
@@ -100,7 +102,7 @@ AWS Secrets Manager is used to keep all secret values required for an External A
 There is an ability to create empty AWS Secrets Manager objects that will be connected to ECS Fargate task. This action will prevent storing secrets in terraform state files in plain text.
 
 The list of required actions:
-  - Leave all secrets related veriables with an empty string like `""`. The list of secrets related variables: `api_key` and all variables from `ea_specific_secret_variables`. Check an exhausive example in .examples/complete_secrets folder.
+  - Leave all secret variables veriables in `ea_secret_variables` with an empty string like `""`. Check an exhausive example in .examples/basic_secrets folder.
   - Run `terraform apply`
   - Manually update created AWS SM objects (using AWS Console/CLI/etc.)
   - Restart related External Adapters in ECS (using AWS Console/CLI/etc.) to update them with new values from AWS SM objects.
@@ -109,9 +111,9 @@ The list of required actions:
 
 In most cases all External adapters are needed to store only API_KEY environment variable in AWS SM.
 
-Sometimes, an External Adapter like [bank-frick](https://github.com/smartcontractkit/external-adapters-js/tree/develop/packages/sources/bank-frick) is required more sensetive variables than just API_KEY. In this case, it's possible to include all required values in `ea_specific_secret_variables` block in `external_adapters` variable.
+Sometimes, an External Adapter like [bank-frick](https://github.com/smartcontractkit/external-adapters-js/tree/develop/packages/sources/bank-frick) is required more sensetive variables than just API_KEY. In this case, it's possible to include all required values in `ea_secret_variables` block in `external_adapters` variable.
 
-Check an exhausive example in .examples/complete_secrets folder.
+Check an exhausive example in .examples/basic_secrets folder.
 
 ### Usage of custom task definition file (when default template is not enough)
 
@@ -173,8 +175,6 @@ The list of required actions:
 | [aws_memorydb_cluster.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/memorydb_cluster) | resource |
 | [aws_memorydb_parameter_group.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/memorydb_parameter_group) | resource |
 | [aws_memorydb_subnet_group.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/memorydb_subnet_group) | resource |
-| [aws_secretsmanager_secret.api_key_obj](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret) | resource |
-| [aws_secretsmanager_secret_version.api_key](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret_version) | resource |
 | [aws_security_group.alb_sg](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
 | [aws_security_group.memorydb_sg](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
 | [aws_security_group.tasks_sg](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |

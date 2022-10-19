@@ -41,8 +41,8 @@ locals {
         }]
       ])
 
-      ea_specific_secret_variables = flatten([
-        for spec_sec_var_key, spec_sec_var_value in lookup(value, "ea_specific_secret_variables", {}) : [{
+      ea_secret_variables = flatten([
+        for spec_sec_var_key, spec_sec_var_value in lookup(value, "ea_secret_variables", {}) : [{
           secret_name  = spec_sec_var_key
           secret_value = spec_sec_var_value
         }]
@@ -82,7 +82,6 @@ resource "aws_ecs_task_definition" "this" {
       environment         = var.environment
       ea_name             = each.value.name
       api_tier            = each.value.api_tier
-      api_key             = each.value.api_key != "" ? aws_secretsmanager_secret.api_key_obj[each.value.name].arn : ""
       ws_enabled          = each.value.ws_enabled
       docker_image        = "public.ecr.aws/chainlink/adapters/${each.value.name}-adapter:${each.value.version}"
       aws_region          = var.aws_region
@@ -110,8 +109,8 @@ resource "aws_ecs_task_definition" "this" {
       request_coalescing_entropy_max          = each.value.request_coalescing_entropy_max
       experimental_metrics_enabled            = each.value.experimental_metrics_enabled
 
-      ea_specific_variables        = each.value.ea_specific_variables
-      ea_specific_secret_variables = module.ea_specific_secrets[each.value.name].secrets
+      ea_specific_variables = each.value.ea_specific_variables
+      ea_secret_variables   = module.ea_specific_secrets[each.value.name].secrets
     }
   )
 }

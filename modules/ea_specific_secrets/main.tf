@@ -11,7 +11,7 @@ resource "aws_secretsmanager_secret" "this" {
 resource "aws_secretsmanager_secret_version" "this" {
   for_each = { for secret in var.secrets : secret.secret_name => secret if secret.secret_value != "" }
 
-  secret_id     = aws_secretsmanager_secret.this[each.value.secret].id
+  secret_id     = aws_secretsmanager_secret.this[each.value.secret_name].id
   secret_string = each.value.secret_value
 }
 

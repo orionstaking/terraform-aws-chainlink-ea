@@ -44,19 +44,20 @@ module "chainlink_ea" {
     coingecko = {
       # source code:  https://github.com/smartcontractkit/external-adapters-js/tree/develop/packages/sources/coingecko
       # subscription: https://github.com/smartcontractkit/external-adapters-js/blob/develop/packages/sources/coingecko/src/config/limits.json
-      version     = "1.6.7", # https://gallery.ecr.aws/chainlink/adapters/coingecko-adapter
-      api_tier    = "analyst",
-      alb_port    = "1113",
-      api_key     = "api_key", # https://www.coingecko.com/en/developers/dashboard
-      cpu         = 256,
-      memory      = 512,
-      log_level   = "info",
-      health_path = "/health",
-      timeout     = "30000",
-
+      version     = "1.6.7" # https://gallery.ecr.aws/chainlink/adapters/coingecko-adapter
+      api_tier    = "analyst"
+      alb_port    = "1113"
+      cpu         = 256
+      memory      = 512
+      log_level   = "info"
+      health_path = "/health"
+      timeout     = "30000"
       ea_specific_variables = {
-        SPECIFIC_VAR_KEY_1 = "SPECIFIC_VAR_VALUE_1",
+        SPECIFIC_VAR_KEY_1 = "SPECIFIC_VAR_VALUE_1"
         SPECIFIC_VAR_KEY_1 = "SPECIFIC_VAR_VALUE_2"
+      }
+      ea_secret_variables = {
+        API_KEY = "API_KEY_VALUE" # https://www.coingecko.com/en/developers/dashboard
       }
       # full list in main README.md
     }

@@ -23,21 +23,6 @@ data "aws_iam_policy_document" "this" {
       "*",
     ]
   }
-
-  dynamic "statement" {
-    for_each = { for ea in local.external_adapters : ea.name => ea }
-
-    content {
-      effect = "Allow"
-      actions = [
-        "secretsmanager:GetSecretValue",
-        "kms:Decrypt"
-      ]
-      resources = [
-        aws_secretsmanager_secret.api_key_obj[statement.value.name].arn
-      ]
-    }
-  }
 }
 
 resource "aws_iam_policy" "this" {
