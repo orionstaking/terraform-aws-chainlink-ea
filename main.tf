@@ -1,7 +1,7 @@
 locals {
 
   # more info about default vars could be found here: https://github.com/smartcontractkit/external-adapters-js/blob/develop/packages/core/bootstrap/README.md 
-  # it's possible to pass or rewrite default velue any of environemnt variable from list in the link by adding it in 'ea_specific_variables' block
+  # it's possible to pass or rewrite a default velue of any environemnt variable from the list in the link by adding it in 'ea_specific_variables' block
   external_adapters = flatten([
     for key, value in var.external_adapters : [{
       name                    = key
