@@ -42,20 +42,12 @@
         { "name" : "EXPERIMENTAL_METRICS_ENABLED", "value" : "${experimental_metrics_enabled}" },
         { "name" : "METRICS_NAME", "value" : "${ea_name}" }
       ],
-    %{ if api_key != "" }
-    "secrets": [
-      %{~ for secret in ea_specific_secret_variables ~}
-      {
-        "name": "${secret.name}",
-        "valueFrom": "${secret.valueFrom}"
-      },
-      %{~ endfor ~}
-      {
-        "name": "API_KEY",
-        "valueFrom": "${api_key}"
+    "secrets": ${jsonencode([
+      for secret in ea_secret_variables : {
+        name      = "${secret.name}"
+        valueFrom = "${secret.valueFrom}" 
       }
-    ],
-    %{ endif }
+    ])},
     "logConfiguration": {
       "logDriver": "awslogs",
       "options": {

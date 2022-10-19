@@ -42,26 +42,25 @@ module "chainlink_ea" {
 
   external_adapters = {
     coingecko = {
-      version     = "1.6.7",
-      api_tier    = "analyst",
-      alb_port    = "1113",
-      api_key     = "API_KEY_VALUE", # Value of AWS SM object will be set to "API_KEY_VALUE"
-
-      ea_specific_secret_variables = {
+      version     = "1.6.7"
+      api_tier    = "analyst"
+      alb_port    = "1113"
+      ea_secret_variables = {
+        API_KEY        = "API_KEY_VALUE" # Value of AWS SM object will be set to "API_KEY_VALUE"
         SECRET_VAR_KEY = "SECRET_VAR_VALUE" # Value of AWS SM object will be set to "SECRET_VAR_VALUE"
       }
-    },
+    }
     bank-frick = {
-      version  = "0.0.7",
-      api_tier = "production",
-      alb_port = "1182",
-      api_key  = "" # Value of AWS SM object won't be set. You'll need to set a value manually
+      version  = "0.0.7"
+      api_tier = "production"
+      alb_port = "1182"
       ea_specific_variables = {
-        PAGE_SIZE    = "500",
+        PAGE_SIZE    = "500"
         API_ENDPOINT = "API_ENDPOINT_VALUE"
       }
-      ea_specific_secret_variables = {
-        PRIVATE_KEY = "" # Value of AWS SM object won't be set. You'll need to set a value manually
+      ea_secret_variables = {
+        API_KEY     = "" # If leave an empty string, value of AWS SM object won't be set. You'll need to set a value manually
+        PRIVATE_KEY = "" # If leave an empty string, value of AWS SM object won't be set. You'll need to set a value manually
       }
     }
   }
