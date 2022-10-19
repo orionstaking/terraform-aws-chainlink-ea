@@ -46,14 +46,19 @@ module "chainlink_ea" {
     coingecko = {
       # source code:  https://github.com/smartcontractkit/external-adapters-js/tree/develop/packages/sources/coingecko
       # subscription: https://github.com/smartcontractkit/external-adapters-js/blob/develop/packages/sources/coingecko/src/config/limits.json
-      version     = "1.6.7" # https://gallery.ecr.aws/chainlink/adapters/coingecko-adapter
-      api_tier    = "analyst"
-      alb_port    = "1113"
-      cpu         = 256
-      memory      = 512
-      log_level   = "info"
-      health_path = "/health"
-      timeout     = "30000"
+      version                 = "1.6.7" # https://gallery.ecr.aws/chainlink/adapters/coingecko-adapter
+      rate_limit_enabled      = "true"
+      rate_limit_api_tier     = "analyst"
+      rate_limit_api_provider = "coingecko"
+      ea_port                 = "8080"
+      alb_port                = "1113"
+      health_path             = "/health"
+      cpu                     = 256
+      memory                  = 512
+      cache_enabled           = "true"
+      cache_type              = "redis"
+      cache_key_group         = "coingecko"
+      log_level               = "info"
       ea_secret_variables = {
         API_KEY = "API_KEY_VALUE" # https://www.coingecko.com/en/developers/dashboard
       }
@@ -61,14 +66,13 @@ module "chainlink_ea" {
         SPECIFIC_VAR_KEY_1 = "SPECIFIC_VAR_VALUE_1",
         SPECIFIC_VAR_KEY_1 = "SPECIFIC_VAR_VALUE_2"
       }
-      # full list in main README.md
     }
     tiingo = {
       # source code:  https://github.com/smartcontractkit/external-adapters-js/tree/develop/packages/sources/tiingo
       # subscription: https://github.com/smartcontractkit/external-adapters-js/blob/develop/packages/sources/tiingo/src/config/limits.json
-      version  = "1.10.7" # https://gallery.ecr.aws/chainlink/adapters/tiingo-adapter
-      api_tier = "power"
-      alb_port = "1134"
+      version             = "1.10.7" # https://gallery.ecr.aws/chainlink/adapters/tiingo-adapter
+      rate_limit_api_tier = "power"
+      alb_port            = "1134"
       ea_secret_variables = {
         API_KEY = "API_KEY_VALUE" # https://api.tiingo.com/account/profile
       }
@@ -76,9 +80,9 @@ module "chainlink_ea" {
     coinmarketcap = {
       # source code:  https://github.com/smartcontractkit/external-adapters-js/tree/develop/packages/sources/coinmarketcap
       # subscription: https://github.com/smartcontractkit/external-adapters-js/blob/develop/packages/sources/coinmarketcap/src/config/limits.json
-      version  = "1.3.39" # https://gallery.ecr.aws/chainlink/adapters/coinmarketcap-adapter
-      api_tier = "startup"
-      alb_port = "1115"
+      version             = "1.3.39" # https://gallery.ecr.aws/chainlink/adapters/coinmarketcap-adapter
+      rate_limit_api_tier = "startup"
+      alb_port            = "1115"
       ea_secret_variables = {
         API_KEY = "API_KEY_VALUE" # https://pro.coinmarketcap.com/account
       }
@@ -86,9 +90,9 @@ module "chainlink_ea" {
     cryptocompare = {
       # source code:  https://github.com/smartcontractkit/external-adapters-js/tree/develop/packages/sources/cryptocompare
       # subscription: https://github.com/smartcontractkit/external-adapters-js/blob/develop/packages/sources/cryptocompare/src/config/limits.json
-      version  = "1.3.26" # https://gallery.ecr.aws/chainlink/adapters/cryptocompare-adapter
-      api_tier = "professional"
-      alb_port = "1114"
+      version             = "1.3.26" # https://gallery.ecr.aws/chainlink/adapters/cryptocompare-adapter
+      rate_limit_api_tier = "professional"
+      alb_port            = "1114"
       ea_secret_variables = {
         API_KEY = "API_KEY_VALUE" # https://www.cryptocompare.com/cryptopian/api-keys
       }
@@ -96,9 +100,9 @@ module "chainlink_ea" {
     alphavantage = {
       # source code:  https://github.com/smartcontractkit/external-adapters-js/tree/develop/packages/sources/alphavantage
       # subscription: https://github.com/smartcontractkit/external-adapters-js/blob/develop/packages/sources/alphavantage/src/config/limits.json
-      version  = "1.1.39" # https://gallery.ecr.aws/chainlink/adapters/alphavantage-adapter
-      api_tier = "free"
-      alb_port = "1152"
+      version             = "1.1.39" # https://gallery.ecr.aws/chainlink/adapters/alphavantage-adapter
+      rate_limit_api_tier = "free"
+      alb_port            = "1152"
       ea_secret_variables = {
         API_KEY = "API_KEY_VALUE" # https://www.alphavantage.co/support/#api-key
       }
@@ -106,9 +110,9 @@ module "chainlink_ea" {
     coinpaprika = {
       # source code:  https://github.com/smartcontractkit/external-adapters-js/tree/develop/packages/sources/coinpaprika
       # subscription: https://github.com/smartcontractkit/external-adapters-js/blob/develop/packages/sources/coinpaprika/src/config/limits.json
-      version  = "1.8.10" # https://gallery.ecr.aws/chainlink/adapters/coinpaprika-adapter
-      api_tier = "free"
-      alb_port = "1116"
+      version             = "1.8.10" # https://gallery.ecr.aws/chainlink/adapters/coinpaprika-adapter
+      rate_limit_api_tier = "free"
+      alb_port            = "1116"
       ea_secret_variables = {
         API_KEY = "API_KEY_VALUE" # https://coinpaprika.com/api/panel/
       }
@@ -116,9 +120,9 @@ module "chainlink_ea" {
     coinapi = {
       # source code:  https://github.com/smartcontractkit/external-adapters-js/tree/develop/packages/sources/coinapi
       # subscription: https://github.com/smartcontractkit/external-adapters-js/blob/develop/packages/sources/coinapi/src/config/limits.json
-      version  = "1.1.41" # https://gallery.ecr.aws/chainlink/adapters/coinapi-adapter
-      api_tier = "free"
-      alb_port = "1112"
+      version             = "1.1.41" # https://gallery.ecr.aws/chainlink/adapters/coinapi-adapter
+      rate_limit_api_tier = "free"
+      alb_port            = "1112"
       ea_secret_variables = {
         API_KEY = "API_KEY_VALUE" # https://www.coinapi.io/Account/GetCode
       }
@@ -126,9 +130,9 @@ module "chainlink_ea" {
     fixer = {
       # source code:  https://github.com/smartcontractkit/external-adapters-js/tree/develop/packages/sources/fixer
       # subscription: https://github.com/smartcontractkit/external-adapters-js/blob/develop/packages/sources/fixer/src/config/limits.json
-      version  = "1.3.38" # https://gallery.ecr.aws/chainlink/adapters/fixer-adapter
-      api_tier = "free"
-      alb_port = "1130"
+      version             = "1.3.38" # https://gallery.ecr.aws/chainlink/adapters/fixer-adapter
+      rate_limit_api_tier = "free"
+      alb_port            = "1130"
       ea_secret_variables = {
         API_KEY = "API_KEY_VALUE" # https://fixer.io/
       }
@@ -136,9 +140,9 @@ module "chainlink_ea" {
     currencylayer = {
       # source code:  https://github.com/smartcontractkit/external-adapters-js/tree/develop/packages/sources/currencylayer
       # subscription: https://github.com/smartcontractkit/external-adapters-js/blob/develop/packages/sources/currencylayer/src/config/limits.json
-      version  = "1.3.38" # https://gallery.ecr.aws/chainlink/adapters/currencylayer-adapter
-      api_tier = "free"
-      alb_port = "1141"
+      version             = "1.3.38" # https://gallery.ecr.aws/chainlink/adapters/currencylayer-adapter
+      rate_limit_api_tier = "free"
+      alb_port            = "1141"
       ea_secret_variables = {
         API_KEY = "API_KEY_VALUE" # https://currencylayer.com/product
       }
@@ -146,9 +150,9 @@ module "chainlink_ea" {
     unibit = {
       # source code:  https://github.com/smartcontractkit/external-adapters-js/tree/develop/packages/sources/unibit
       # subscription: https://github.com/smartcontractkit/external-adapters-js/blob/develop/packages/sources/unibit/src/config/limits.json
-      version  = "1.3.35" # https://gallery.ecr.aws/chainlink/adapters/unibit-adapter
-      api_tier = "freetrial"
-      alb_port = "1143"
+      version             = "1.3.35" # https://gallery.ecr.aws/chainlink/adapters/unibit-adapter
+      rate_limit_api_tier = "freetrial"
+      alb_port            = "1143"
       ea_secret_variables = {
         API_KEY = "API_KEY_VALUE" # https://unibit.ai/signin
       }
@@ -156,9 +160,9 @@ module "chainlink_ea" {
     bitex = {
       # source code:  https://github.com/smartcontractkit/external-adapters-js/tree/develop/packages/sources/bitex
       # subscription: https://github.com/smartcontractkit/external-adapters-js/blob/develop/packages/sources/bitex/src/config/limits.json
-      version  = "1.3.40" # https://gallery.ecr.aws/chainlink/adapters/bitrex-adapter
-      api_tier = "free"
-      alb_port = "1191"
+      version             = "1.3.40" # https://gallery.ecr.aws/chainlink/adapters/bitrex-adapter
+      rate_limit_api_tier = "free"
+      alb_port            = "1191"
       ea_secret_variables = {
         API_KEY = "API_KEY_VALUE" # https://sandbox.bitex.la/
       }
@@ -166,9 +170,9 @@ module "chainlink_ea" {
     intrinio = {
       # source code:  https://github.com/smartcontractkit/external-adapters-js/tree/develop/packages/sources/intrinio
       # subscription: https://github.com/smartcontractkit/external-adapters-js/blob/develop/packages/sources/intrinio/src/config/limits.json
-      version  = "1.2.18" # https://gallery.ecr.aws/chainlink/adapters/intrinio-adapter
-      api_tier = "bronze"
-      alb_port = "1192"
+      version             = "1.2.18" # https://gallery.ecr.aws/chainlink/adapters/intrinio-adapter
+      rate_limit_api_tier = "bronze"
+      alb_port            = "1192"
       ea_secret_variables = {
         API_KEY = "API_KEY_VALUE" # https://account.intrinio.com/account/api_keys/keys
       }
@@ -176,9 +180,9 @@ module "chainlink_ea" {
     nomics = {
       # source code:  https://github.com/smartcontractkit/external-adapters-js/tree/develop/packages/sources/nomics
       # subscription: https://github.com/smartcontractkit/external-adapters-js/blob/develop/packages/sources/nomics/src/config/limits.json
-      version  = "1.2.11" # https://gallery.ecr.aws/chainlink/adapters/nomics-adapter
-      api_tier = "free"
-      alb_port = "1111"
+      version             = "1.2.11" # https://gallery.ecr.aws/chainlink/adapters/nomics-adapter
+      rate_limit_api_tier = "free"
+      alb_port            = "1111"
       ea_secret_variables = {
         API_KEY = "API_KEY_VALUE" # https://p.nomics.com/pricing#free-plan
       }

@@ -61,9 +61,9 @@ module "chainlink_ea" {
   # Examples for all supprted and tested adapters could be found in ./examples/complete_memorydb_redis
   external_adapters = {
     coingecko = {
-      version  = "1.6.7"
-      api_tier = "analyst"
-      alb_port = "1113"
+      version             = "1.6.7"
+      rate_limit_api_tier = "analyst"
+      alb_port            = "1113"
       ea_secret_variables = {
         API_KEY = "api_key" # if reqired by EA
       }
@@ -73,23 +73,23 @@ module "chainlink_ea" {
 ```
 
 List of Chainlink EA's supported environment variables that could be specified using `external_adapters` variable.
-  - timeout
-  - cache_enabled
-  - cache_type
-  - cache_max_age
-  - cache_redis_timeout
-  - rate_limit_enabled
-  - warmup_enabled
-  - log_level
-  - debug
-  - api_verbose
-  - external_metrics_enabled
-  - retry
-  - request_coalescing_enabled
-  - request_coalescing_interval
-  - request_coalescing_interval_max
-  - request_coalescing_interval_coefficient
-  - request_coalescing_entropy_max
+  - `version`: **required**, defines version of docker image from [adapter's ECR public repo](https://gallery.ecr.aws/chainlink/adapters/{adapter_name}-adapter)
+  - `rate_limit_enabled`: optional, defines `RATE_LIMIT_ENABLES` from [default vars list](https://github.com/smartcontractkit/external-adapters-js/tree/develop/packages/core/bootstrap#server-configuration). Defaults to `true`
+  - `rate_limit_api_provider`: optional, defines `RATE_LIMIT_API_PROVIDER` from [default vars list](https://github.com/smartcontractkit/external-adapters-js/tree/develop/packages/core/bootstrap#server-configuration). Defaults to EA's name
+  - `rate_limit_api_tier`: optional, defines `RATE_LIMIT_API_TIER` from [default vars list](https://github.com/smartcontractkit/external-adapters-js/tree/develop/packages/core/bootstrap#server-configuration). Defaults to `""`
+  - `ea_port`: oprional, defines `EA_PORT` from [default vars list](https://github.com/smartcontractkit/external-adapters-js/tree/develop/packages/core/bootstrap#server-configuration). Defaults to `8080`
+  - `alb_port`: **required**, defines port on which ALB target group will listen requests from ALB. This port then should be specified in `Bridges` tab of Chainlink Node
+  - `health_path`: optional, defines path on which ALB target group will check EA's health. Defaults to `/health`
+  - `cpu`: optional, defines allocated CPU for EA. Defaults to `256`
+  - `memory`: optional, defines allocated Memory for EA. Defaults to `512`
+  - `cache_enabled`: optional, defines `CACHE_ENABLED` from [default vars list](https://github.com/smartcontractkit/external-adapters-js/tree/develop/packages/core/bootstrap#server-configuration). Defaults to `true`
+  - `cache_type`: optional, defines what type of cache should be used for EA. Available options are `local` and `redis`. Defaults to `local`. To use `redis` it's also necessary to set `cache_redis` terraform variable to `true`
+  - `cache_key_group`: optional, defines `CACHE_KEY_GROUP` from [default vars list](https://github.com/smartcontractkit/external-adapters-js/tree/develop/packages/core/bootstrap#server-configuration). Defaults to EA's name
+  - `log_level`: optional, defines `LOG_LEVEL` from [default vars list](https://github.com/smartcontractkit/external-adapters-js/tree/develop/packages/core/bootstrap#server-configuration). Defaults to `info`
+
+Any other specific or non-default variable could be set using `ea_specific_variables` variable in `external_adapters` block. Please check available options [here](https://github.com/smartcontractkit/external-adapters-js/tree/develop/packages/core/bootstrap#server-configuration) and usage examples in examples directory.
+
+For any secret variable please use `ea_secret_variables` variable in `external_adapters` block. Please check examples in examples directory.
 
 ## Notes
 
@@ -148,7 +148,7 @@ The list of required actions:
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_ea_specific_secrets"></a> [ea\_specific\_secrets](#module\_ea\_specific\_secrets) | ./modules/ea_specific_secrets | n/a |
+| <a name="module_ea_secrets"></a> [ea\_secrets](#module\_ea\_secrets) | ./modules/ea_secrets | n/a |
 
 ## Resources
 
