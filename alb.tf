@@ -14,7 +14,7 @@ resource "aws_lb_target_group" "ea" {
   for_each = { for ea in local.external_adapters : ea.name => ea }
 
   name                 = each.value.name
-  port                 = each.value.app_port
+  port                 = each.value.ea_port
   protocol             = "HTTP"
   target_type          = "ip"
   vpc_id               = var.vpc_id
