@@ -168,7 +168,7 @@ resource "aws_cloudwatch_metric_alarm" "elb" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "memorydb_cpu" {
-  count = var.monitoring_enabled ? 1 : 0
+  count = var.monitoring_enabled && var.cache_redis ? 1 : 0
 
   alarm_name          = "${var.project}-${var.environment}-ea-memorydb-CPUUtilization"
   comparison_operator = "GreaterThanThreshold"
@@ -189,7 +189,7 @@ resource "aws_cloudwatch_metric_alarm" "memorydb_cpu" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "memorydb_memory" {
-  count = var.monitoring_enabled ? 1 : 0
+  count = var.monitoring_enabled && var.cache_redis ? 1 : 0
 
   alarm_name          = "${var.project}-${var.environment}-ea-memorydb-DatabaseMemoryUsagePercentage"
   comparison_operator = "GreaterThanThreshold"
