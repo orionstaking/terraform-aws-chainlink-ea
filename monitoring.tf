@@ -146,7 +146,7 @@ resource "aws_cloudwatch_metric_alarm" "cpu_utilization" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "elb" {
-  for_each = var.monitoring_enabled ? toset(["4XX", "5XX"]) : []
+  for_each = var.monitoring_enabled && var.elb_alarms_enabled ? toset(["4XX", "5XX"]) : []
 
   alarm_name          = "${var.project}-${var.environment}-ea-elb-${each.key}"
   comparison_operator = "GreaterThanThreshold"

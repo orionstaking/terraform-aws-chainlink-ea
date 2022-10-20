@@ -87,3 +87,9 @@ variable "sns_topic_arn" {
   default     = ""
   type        = string
 }
+
+variable "elb_alarms_enabled" {
+  description = "Defines whether to create CloudWatch alarms of 4XX and 5XX status codes on ALB or not. Alarms will be created only if `monitoring_enabled` variable is set to `true`"
+  default     = true
+  type        = bool
+}
