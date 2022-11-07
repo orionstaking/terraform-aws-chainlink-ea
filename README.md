@@ -8,24 +8,7 @@ Terraform module which creates AWS infra for Chainlink External Adapters:
   - AWS MemoryDB (to enable Redis cache)
   - AWS CloudWatch
 
-At the time of writing, the following External Adapters are fully supported and tested:
-  - coingecko
-  - coinmarketcap
-  - tiingo
-  - cryptocompare
-  - alphavantage
-  - coinpaprika
-  - coinapi
-  - fixer
-  - currencylayer
-  - unibit
-  - bitex
-  - intrinio
-  - nomics
-  - jpegd
-  - bank-frick
-
-All adapters, that available on [chainlink/adapters](https://gallery.ecr.aws/?searchTerm=chainlink%2Fadapters) could be supported as well, but not tested yet.
+Supports all adapters available on [chainlink/adapters](https://gallery.ecr.aws/?searchTerm=chainlink%2Fadapters).
 
 Terraform module for Chainlink Node: [here](https://github.com/orionterra/terraform-aws-chainlink-node)
 
