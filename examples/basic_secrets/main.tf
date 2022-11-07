@@ -46,7 +46,7 @@ module "chainlink_ea" {
       rate_limit_api_tier = "analyst"
       alb_port            = "1113"
       ea_secret_variables = {
-        API_KEY        = "API_KEY_VALUE" # Value of AWS SM object will be set to "API_KEY_VALUE"
+        API_KEY        = "API_KEY_VALUE"    # Value of AWS SM object will be set to "API_KEY_VALUE"
         SECRET_VAR_KEY = "SECRET_VAR_VALUE" # Value of AWS SM object will be set to "SECRET_VAR_VALUE"
       }
     }

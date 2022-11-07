@@ -44,11 +44,33 @@ module "chainlink_ea" {
   # Examples for all supprted and tested adapters could be found in ./examples/complete_memorydb_redis
   external_adapters = {
     coingecko = {
-      version             = "1.6.7"
-      rate_limit_api_tier = "analyst"
-      alb_port            = "1113"
+      version                 = "1.6.7" # required, check latest version on adapters repository
+      rate_limit_api_tier     = "analyst" # required, check available options in adapter sc repository
+      alb_port                = "1113" # required, should be unique
+      rate_limit_enabled      = "true" # optional, defaults to "true"
+      rate_limit_api_provider = "coingecko" # optional, default value is set to adapter's name
+      ea_port                 = "8080" # optional, defaults to "8080"
+      health_path             = "/health" # optional, defaults to "/health"
+      cpu                     = "256" # optional, defaults to "256"
+      memory                  = "512" # optional, defaults to "512"
+      cache_enabled           = "true" # optional, defaults to "true"
+      cache_type              = "local" # optional, default to "local"
+      cache_key_group         = "coingecko" # optional, default value is set to adapter's name
+      log_level               = "info" # optional, default to "info"
+
+      # Optional block for secret environment variables required by the adapter
+      # For each secret variable, AWS Secrets Manager object and its value will be created
+      # It's possible to leave value as an empty string, in this case only AWS Secrets Manager object
+      #   will be created. Then you need to set the value for this object manually using AWS web console
+      #   or CLI. In this case value of the secret variable won't be stored in terraform state files.
       ea_secret_variables = {
-        API_KEY = "api_key" # if reqired by EA
+        API_KEY = "api_key_value"
+      }
+
+      # Optional block for any specific anvironment variables required by adapter
+      ea_specific_variables = {
+        SPECIFIC_ENV_VAR_KEY_1 = "SPECIFIC_ENV_VAR_VALUE_1"
+        SPECIFIC_ENV_VAR_KEY_2 = "SPECIFIC_ENV_VAR_VALUE_2"
       }
     }
   }
