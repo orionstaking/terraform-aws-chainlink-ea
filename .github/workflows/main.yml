@@ -86,7 +86,6 @@ jobs:
           install-hcledit: true
           hcledit-version: 0.2.6
           args: "--color=always --show-diff-on-failure --files ${{ matrix.directory }}/*"
-          directory: ${{ matrix.directory }}
 
       - name: Pre-commit Terraform ${{ steps.minMax.outputs.maxVersion }}
         uses: clowdhaus/terraform-composite-actions/pre-commit@v1.8.3
@@ -97,4 +96,3 @@ jobs:
           install-hcledit: true
           hcledit-version: 0.2.6
           args: "--color=always --show-diff-on-failure --files $(ls *.tf)"
-          directory: ${{ matrix.directory }}
