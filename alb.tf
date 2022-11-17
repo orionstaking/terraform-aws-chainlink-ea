@@ -60,7 +60,7 @@ resource "aws_security_group_rule" "ingress_alb_allow_ea" {
   from_port   = 0
   to_port     = each.value.alb_port
   protocol    = "tcp"
-  cidr_blocks = ["${var.vpc_cidr_block}"]
+  cidr_blocks = [var.vpc_cidr_block]
 
   security_group_id = aws_security_group.alb_sg.id
 }
