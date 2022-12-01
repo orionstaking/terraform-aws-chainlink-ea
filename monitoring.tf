@@ -34,7 +34,7 @@ resource "aws_cloudwatch_metric_alarm" "log_alarms" {
   statistic           = "Sum"
   threshold           = "0"
   alarm_description   = "Errors detected in ${each.value.name} external adapter CloudWatch log group"
-  actions_enabled     = "true"
+  actions_enabled     = each.value.alarms_disabled == "true" ? "false" : "true"
   treat_missing_data  = "notBreaching"
   alarm_actions       = var.sns_topic_arn == "" ? [aws_sns_topic.this[0].arn] : [var.sns_topic_arn]
   ok_actions          = var.sns_topic_arn == "" ? [aws_sns_topic.this[0].arn] : [var.sns_topic_arn]
@@ -49,7 +49,7 @@ resource "aws_cloudwatch_metric_alarm" "memory_utilization" {
   evaluation_periods  = "1"
   threshold           = "80"
   alarm_description   = "Memory utilization has exceeded 80%"
-  actions_enabled     = "true"
+  actions_enabled     = each.value.alarms_disabled == "true" ? "false" : "true"
   alarm_actions       = var.sns_topic_arn == "" ? [aws_sns_topic.this[0].arn] : [var.sns_topic_arn]
   ok_actions          = var.sns_topic_arn == "" ? [aws_sns_topic.this[0].arn] : [var.sns_topic_arn]
 
@@ -101,7 +101,7 @@ resource "aws_cloudwatch_metric_alarm" "cpu_utilization" {
   evaluation_periods  = "1"
   threshold           = "80"
   alarm_description   = "CPU utilization has exceeded 80%"
-  actions_enabled     = "true"
+  actions_enabled     = each.value.alarms_disabled == "true" ? "false" : "true"
   alarm_actions       = var.sns_topic_arn == "" ? [aws_sns_topic.this[0].arn] : [var.sns_topic_arn]
   ok_actions          = var.sns_topic_arn == "" ? [aws_sns_topic.this[0].arn] : [var.sns_topic_arn]
 

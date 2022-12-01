@@ -41,6 +41,9 @@ module "chainlink_ea" {
   vpc_cidr_block      = "10.100.0.0/20"
   vpc_private_subnets = [ "subnet-082682fbde3f95edc", "subnet-092clfgc8f424cab3" ]
 
+  monitoring_enabled = true
+  elb_alarms_enabled = false
+
   # Examples for all supprted and tested adapters could be found in ./examples/complete_memorydb_redis
   external_adapters = {
     coingecko = {
@@ -57,6 +60,7 @@ module "chainlink_ea" {
       cache_type              = "local" # optional, default to "local"
       cache_key_group         = "coingecko" # optional, default value is set to adapter's name
       log_level               = "info" # optional, default to "info"
+      alarms_disabled         = "false" # optional, default to "false"
 
       # Optional block for secret environment variables required by the adapter
       # For each secret variable, AWS Secrets Manager object and its value will be created
@@ -91,6 +95,7 @@ List of Chainlink EA's supported environment variables that could be specified u
   - `cache_type`: optional, defines what type of cache should be used for EA. Available options are `local` and `redis`. Defaults to `local`. To use `redis` it's also necessary to set `cache_redis` terraform variable to `true`
   - `cache_key_group`: optional, defines `CACHE_KEY_GROUP` from [default vars list](https://github.com/smartcontractkit/external-adapters-js/tree/develop/packages/core/bootstrap#server-configuration). Defaults to EA's name
   - `log_level`: optional, defines `LOG_LEVEL` from [default vars list](https://github.com/smartcontractkit/external-adapters-js/tree/develop/packages/core/bootstrap#server-configuration). Defaults to `info`
+  - `alarms_disabled`: optional, defines whether alarm action items should be executed or not for a specific external adapter. Could be helpful during planned maintenance. Defaults to `false`
 
 Any other specific or non-default variable could be set using `ea_specific_variables` variable in `external_adapters` block. Please check available options [here](https://github.com/smartcontractkit/external-adapters-js/tree/develop/packages/core/bootstrap#server-configuration) and usage examples in examples directory.
 
