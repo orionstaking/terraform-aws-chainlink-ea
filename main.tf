@@ -19,6 +19,7 @@ locals {
       cache_type              = var.cache_redis ? lookup(value, "cache_type", "redis") : "local"
       cache_key_group         = lookup(value, "cache_key_group", key)
       log_level               = lookup(value, "log_level", "info")
+      alarms_disabled         = lookup(value, "alarms_disabled", "false")
 
       ea_specific_variables = flatten([
         for spec_var_key, spec_var_value in lookup(value, "ea_specific_variables", {}) : [{

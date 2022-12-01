@@ -91,6 +91,7 @@ List of Chainlink EA's supported environment variables that could be specified u
   - `cache_type`: optional, defines what type of cache should be used for EA. Available options are `local` and `redis`. Defaults to `local`. To use `redis` it's also necessary to set `cache_redis` terraform variable to `true`
   - `cache_key_group`: optional, defines `CACHE_KEY_GROUP` from [default vars list](https://github.com/smartcontractkit/external-adapters-js/tree/develop/packages/core/bootstrap#server-configuration). Defaults to EA's name
   - `log_level`: optional, defines `LOG_LEVEL` from [default vars list](https://github.com/smartcontractkit/external-adapters-js/tree/develop/packages/core/bootstrap#server-configuration). Defaults to `info`
+  - `alarms_disabled`: optional, defines whether alarm action items should be executed or not for a specific external adapter. Could be helpful during planned maintenance. Defaults to `false`
 
 Any other specific or non-default variable could be set using `ea_specific_variables` variable in `external_adapters` block. Please check available options [here](https://github.com/smartcontractkit/external-adapters-js/tree/develop/packages/core/bootstrap#server-configuration) and usage examples in examples directory.
 
