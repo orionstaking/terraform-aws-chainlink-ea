@@ -41,6 +41,9 @@ module "chainlink_ea" {
   vpc_cidr_block      = "10.100.0.0/20"
   vpc_private_subnets = [ "subnet-082682fbde3f95edc", "subnet-092clfgc8f424cab3" ]
 
+  monitoring_enabled = true
+  elb_alarms_enabled = false
+
   # Examples for all supprted and tested adapters could be found in ./examples/complete_memorydb_redis
   external_adapters = {
     coingecko = {
@@ -57,6 +60,7 @@ module "chainlink_ea" {
       cache_type              = "local" # optional, default to "local"
       cache_key_group         = "coingecko" # optional, default value is set to adapter's name
       log_level               = "info" # optional, default to "info"
+      alarms_disabled         = "false" # optional, default to "false"
 
       # Optional block for secret environment variables required by the adapter
       # For each secret variable, AWS Secrets Manager object and its value will be created
