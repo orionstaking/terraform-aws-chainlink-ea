@@ -3,7 +3,7 @@
     "name": "${project}-${environment}-${ea_name}",
     "cpu": ${cpu},
     "memory": ${memory},
-    "image": "${docker_image}",
+    "image": "${docker_image}:${docker_tag}",
     "essential": true,
     "portMappings": [
       {
