@@ -42,7 +42,6 @@ module "chainlink_ea" {
 
   external_adapters = {
     coingecko = {
-      version             = "1.6.7"
       rate_limit_api_tier = "analyst"
       alb_port            = "1113"
       ea_secret_variables = {
@@ -51,7 +50,6 @@ module "chainlink_ea" {
       }
     }
     bank-frick = {
-      version             = "0.0.7"
       rate_limit_api_tier = "production"
       alb_port            = "1182"
       ea_specific_variables = {

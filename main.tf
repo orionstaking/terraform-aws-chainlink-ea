@@ -6,7 +6,7 @@ locals {
     for key, value in var.external_adapters : [{
       name                    = key
       custom_task_definition  = lookup(value, "custom", "false")
-      version                 = lookup(value, "version", "latest")
+      version                 = lookup(value, "version", "auto")
       rate_limit_enabled      = lookup(value, "rate_limit_enabled", "true")
       rate_limit_api_provider = lookup(value, "rate_limit_api_provider", key)
       rate_limit_api_tier     = lookup(value, "rate_limit_api_tier", "")
@@ -40,6 +40,15 @@ locals {
   container_insights_monitoring = var.monitoring_enabled ? "enabled" : "disabled"
 }
 
+data "external" "latest_version" {
+  for_each = { for ea in local.external_adapters : ea.name => ea if ea.version == "auto" }
+
+  program = ["python3", "${path.module}/get_latest_adapter_tag.py"]
+  query = {
+    adapter_name = each.value.name
+  }
+}
+
 # ECS cluster
 resource "aws_ecs_cluster" "this" {
   name = "${var.project}-${var.environment}-ea"
@@ -71,7 +80,8 @@ resource "aws_ecs_task_definition" "this" {
       rate_limit_enabled      = each.value.rate_limit_enabled
       rate_limit_api_tier     = each.value.rate_limit_api_tier
       rate_limit_api_provider = each.value.rate_limit_api_provider
-      docker_image            = "public.ecr.aws/chainlink/adapters/${each.value.name}-adapter:${each.value.version}"
+      docker_image            = "public.ecr.aws/chainlink/adapters/${each.value.name}-adapter"
+      docker_tag              = each.value.version == "auto" ? data.external.latest_version[each.value.name].result.latest_version : each.value.version
       aws_region              = var.aws_region
       ea_port                 = each.value.ea_port
       cpu                     = each.value.cpu

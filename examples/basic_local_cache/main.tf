@@ -42,27 +42,17 @@ module "chainlink_ea" {
 
   external_adapters = {
     coingecko = {
-      # source code:  https://github.com/smartcontractkit/external-adapters-js/tree/develop/packages/sources/coingecko
-      # subscription: https://github.com/smartcontractkit/external-adapters-js/blob/develop/packages/sources/coingecko/src/config/limits.json
-      version                 = "1.6.7" # https://gallery.ecr.aws/chainlink/adapters/coingecko-adapter
-      rate_limit_enabled      = "true"
-      rate_limit_api_tier     = "analyst"
-      rate_limit_api_provider = "coingecko"
-      ea_port                 = "8080"
-      alb_port                = "1113"
-      health_path             = "/health"
-      cpu                     = 256
-      memory                  = 512
-      cache_enabled           = "true"
-      cache_type              = "local"
-      cache_key_group         = "coingecko"
-      log_level               = "info"
+      rate_limit_api_tier = "analyst"
+      alb_port            = "1113"
       ea_secret_variables = {
         API_KEY = "API_KEY_VALUE" # https://www.coingecko.com/en/developers/dashboard
       }
-      ea_specific_variables = {
-        SPECIFIC_VAR_KEY_1 = "SPECIFIC_VAR_VALUE_1",
-        SPECIFIC_VAR_KEY_1 = "SPECIFIC_VAR_VALUE_2"
+    }
+    tiingo = {
+      rate_limit_api_tier = "power"
+      alb_port            = "1134"
+      ea_secret_variables = {
+        API_KEY = "API_KEY_VALUE" # https://api.tiingo.com/account/profile
       }
     }
   }

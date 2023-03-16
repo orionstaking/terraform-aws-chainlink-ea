@@ -47,7 +47,7 @@ module "chainlink_ea" {
   # Examples for all supprted and tested adapters could be found in ./examples/complete_memorydb_redis
   external_adapters = {
     coingecko = {
-      version                 = "1.6.7" # required, check latest version on adapters repository
+      version                 = "1.6.7" # optional, if not specified the module will find the latest version from public AWS ECR
       rate_limit_api_tier     = "analyst" # required, check available options in adapter sc repository
       alb_port                = "1113" # required, should be unique
       rate_limit_enabled      = "true" # optional, defaults to "true"
@@ -82,7 +82,7 @@ module "chainlink_ea" {
 ```
 
 List of Chainlink EA's supported environment variables that could be specified using `external_adapters` variable.
-  - `version`: **required**, defines version of docker image from [adapter's ECR public repo](https://gallery.ecr.aws/chainlink/adapters/{adapter_name}-adapter)
+  - `version`: optional, defines version of docker image from [adapter's ECR public repo](https://gallery.ecr.aws/chainlink/adapters/{adapter_name}-adapter). If not specified the module will find the latest version from public AWS ECR.
   - `rate_limit_enabled`: optional, defines `RATE_LIMIT_ENABLES` from [default vars list](https://github.com/smartcontractkit/external-adapters-js/tree/develop/packages/core/bootstrap#server-configuration). Defaults to `true`
   - `rate_limit_api_provider`: optional, defines `RATE_LIMIT_API_PROVIDER` from [default vars list](https://github.com/smartcontractkit/external-adapters-js/tree/develop/packages/core/bootstrap#server-configuration). Defaults to EA's name
   - `rate_limit_api_tier`: optional, defines `RATE_LIMIT_API_TIER` from [default vars list](https://github.com/smartcontractkit/external-adapters-js/tree/develop/packages/core/bootstrap#server-configuration). Defaults to `""`
@@ -147,12 +147,14 @@ The list of required actions:
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0.0 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 4.12.0 |
+| <a name="requirement_external"></a> [external](#requirement\_external) | 2.2.3 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
 | <a name="provider_aws"></a> [aws](#provider\_aws) | >= 4.12.0 |
+| <a name="provider_external"></a> [external](#provider\_external) | 2.2.3 |
 
 ## Modules
 
@@ -196,6 +198,7 @@ The list of required actions:
 | [aws_security_group_rule.ingress_mem_allow_self](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) | resource |
 | [aws_sns_topic.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/sns_topic) | resource |
 | [aws_iam_policy_document.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
+| [external_external.latest_version](https://registry.terraform.io/providers/hashicorp/external/2.2.3/docs/data-sources/external) | data source |
 
 ## Inputs
 
