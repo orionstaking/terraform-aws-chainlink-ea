@@ -47,7 +47,7 @@ module "chainlink_ea" {
   # Examples for all supprted and tested adapters could be found in ./examples/complete_memorydb_redis
   external_adapters = {
     coingecko = {
-      version                 = "1.6.7" # required, check latest version on adapters repository
+      version                 = "1.6.7" # optional, if not specified the module will find the latest version from public AWS ECR
       rate_limit_api_tier     = "analyst" # required, check available options in adapter sc repository
       alb_port                = "1113" # required, should be unique
       rate_limit_enabled      = "true" # optional, defaults to "true"
@@ -82,7 +82,7 @@ module "chainlink_ea" {
 ```
 
 List of Chainlink EA's supported environment variables that could be specified using `external_adapters` variable.
-  - `version`: **required**, defines version of docker image from [adapter's ECR public repo](https://gallery.ecr.aws/chainlink/adapters/{adapter_name}-adapter)
+  - `version`: optional, defines version of docker image from [adapter's ECR public repo](https://gallery.ecr.aws/chainlink/adapters/{adapter_name}-adapter). If not specified the module will find the latest version from public AWS ECR.
   - `rate_limit_enabled`: optional, defines `RATE_LIMIT_ENABLES` from [default vars list](https://github.com/smartcontractkit/external-adapters-js/tree/develop/packages/core/bootstrap#server-configuration). Defaults to `true`
   - `rate_limit_api_provider`: optional, defines `RATE_LIMIT_API_PROVIDER` from [default vars list](https://github.com/smartcontractkit/external-adapters-js/tree/develop/packages/core/bootstrap#server-configuration). Defaults to EA's name
   - `rate_limit_api_tier`: optional, defines `RATE_LIMIT_API_TIER` from [default vars list](https://github.com/smartcontractkit/external-adapters-js/tree/develop/packages/core/bootstrap#server-configuration). Defaults to `""`
