@@ -43,7 +43,7 @@ locals {
 data "external" "latest_version" {
   for_each = { for ea in local.external_adapters : ea.name => ea if ea.version == "auto" }
 
-  program = ["python3","${path.module}/get_latest_adapter_tag.py"]
+  program = ["python3", "${path.module}/get_latest_adapter_tag.py"]
   query = {
     adapter_name = each.value.name
   }
