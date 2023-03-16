@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.6.0](https://github.com/orionstaking/terraform-aws-chainlink-ea/compare/v1.5.0...v1.6.0) (2023-03-16)
+
+
+### Features
+
+* Auto fetch the latest versions of adapter images ([#7](https://github.com/orionstaking/terraform-aws-chainlink-ea/issues/7)) ([fc6dc94](https://github.com/orionstaking/terraform-aws-chainlink-ea/commit/fc6dc94285f928077a65e713251d3de09541021e))
+
 ## [1.5.0](https://github.com/ChainOrion/terraform-aws-chainlink-ea/compare/v1.4.1...v1.5.0) (2022-12-01)
 
 
