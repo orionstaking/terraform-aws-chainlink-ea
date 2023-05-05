@@ -24,9 +24,9 @@ variable "vpc_id" {
   type        = string
 }
 
-variable "vpc_cidr_block" {
-  description = "The CIDR block of the VPC"
-  type        = string
+variable "vpc_public_subnets" {
+  description = "VPC public subnets where ALB should be deployed (at least 2)"
+  type        = list(any)
 }
 
 variable "vpc_private_subnets" {
@@ -78,7 +78,7 @@ variable "memorydb_num_replicas_per_shard" {
 
 variable "monitoring_enabled" {
   description = "Defines whether to create CloudWatch dashboard and custom metrics or not"
-  default     = true
+  default     = false
   type        = bool
 }
 
@@ -90,6 +90,30 @@ variable "sns_topic_arn" {
 
 variable "elb_alarms_enabled" {
   description = "Defines whether to create CloudWatch alarms of 4XX and 5XX status codes on ALB or not. Alarms will be created only if `monitoring_enabled` variable is set to `true`"
-  default     = true
+  default     = false
   type        = bool
+}
+
+variable "route53_enabled" {
+  description = "Defines if AWS Route53 record and AWS ACM certificate for EA ALB should be created. Nameservers of your zone should be added to your domain registrar before creation. It will be used to create record in Route53 and verify ACM certificate using DNS"
+  type        = bool
+  default     = false
+}
+
+variable "route53_zoneid" {
+  description = "Route53 hosted zone id. Nameservers of your zone should be added to your domain registrar before creation. It will be used to create record in Route53 and verify ACM certificate using DNS"
+  type        = string
+  default     = ""
+}
+
+variable "route53_domain_name" {
+  description = "Domain name that is used in your AWS Route53 hosted zone. Nameservers of your zone should be added to your domain registrar before creation. It will be used to create record in Route53 and verify ACM certificate using DNS"
+  type        = string
+  default     = ""
+}
+
+variable "route53_subdomain_name" {
+  description = "Subdomain name that will be used to create Route53 record to NLB endpoint with the following format: $var.route53_subdomain_name.$var.route53_domain_name"
+  type        = string
+  default     = ""
 }
