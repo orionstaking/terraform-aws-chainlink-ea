@@ -3,11 +3,6 @@ output "chainlink_ea_load_balancer" {
   value       = module.chainlink_ea.chainlink_ea_load_balancer
 }
 
-output "chainlink_ea_endpoints" {
-  description = "External Adapter endpoints that could be accessible inside VPC CIDR block"
-  value       = module.chainlink_ea.chainlink_ea_endpoints
-}
-
 output "chainlink_ea_memory_db_address" {
   description = "DNS hostname of the cluster configuration endpoint"
   value       = module.chainlink_ea.chainlink_ea_memory_db_address

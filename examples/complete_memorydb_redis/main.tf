@@ -44,19 +44,19 @@ module "chainlink_ea" {
     coingecko = {
       # source code:  https://github.com/smartcontractkit/external-adapters-js/tree/develop/packages/sources/coingecko
       # subscription: https://github.com/smartcontractkit/external-adapters-js/blob/develop/packages/sources/coingecko/src/config/limits.json
-      version                 = "1.6.7" # optional, if not specified the module will find the latest version from public AWS ECR
-      rate_limit_enabled      = "true" # optional, defaults to "true"
-      rate_limit_api_tier     = "analyst" # optional, Rate limiting tier to use from the available options for the adapter. If not present, the adapter will run using the first tier on the list.
+      version                 = "1.6.7"     # optional, if not specified the module will find the latest version from public AWS ECR
+      rate_limit_enabled      = "true"      # optional, defaults to "true"
+      rate_limit_api_tier     = "analyst"   # optional, Rate limiting tier to use from the available options for the adapter. If not present, the adapter will run using the first tier on the list.
       rate_limit_api_provider = "coingecko" # optional, default value is set to adapter's name
-      ea_port                 = "8080" # optional, defaults to "8080"
-      health_path             = "/health" # optional, defaults to "/health"
-      cpu                     = 256 # optional, defaults to "256"
-      memory                  = 512 # optional, defaults to "512"
-      cache_enabled           = "true" # optional, defaults to "true"
-      cache_type              = "redis" # optional, default to "local"
+      ea_port                 = "8080"      # optional, defaults to "8080"
+      health_path             = "/health"   # optional, defaults to "/health"
+      cpu                     = 256         # optional, defaults to "256"
+      memory                  = 512         # optional, defaults to "512"
+      cache_enabled           = "true"      # optional, defaults to "true"
+      cache_type              = "redis"     # optional, default to "local"
       cache_key_group         = "coingecko" # optional, default value is set to adapter's name
-      log_level               = "info" # optional, default to "info"
-      alarms_disabled         = "false" # optional, default to "false", global monitoring variable should be true
+      log_level               = "info"      # optional, default to "info"
+      alarms_disabled         = "false"     # optional, default to "false", global monitoring variable should be true
 
       # Optional block for secret environment variables required by the adapter
       # For each secret variable, AWS Secrets Manager object and its value will be created
