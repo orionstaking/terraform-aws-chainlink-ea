@@ -35,7 +35,7 @@ module "chainlink_ea" {
   aws_region          = "eu-west-1"
   aws_account_id      = data.aws_caller_identity.current.account_id
   vpc_id              = module.vpc.vpc_id
-  vpc_cidr_block      = module.vpc.vpc_cidr_block
+  vpc_public_subnets  = module.vpc.public_subnets
   vpc_private_subnets = module.vpc.private_subnets
 
   external_adapters = {

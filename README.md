@@ -4,8 +4,9 @@ Terraform module which creates AWS infra for Chainlink External Adapters:
   - AWS Fargate
   - AWS Application Load Balancer
   - AWS Secrets Manager (to store API keys and other secrets)
+  - AWS Route53&ACM
   - AWS IAM
-  - AWS MemoryDB (to enable Redis cache)
+  - AWS MemoryDB (if Redis cache is enabled)
   - AWS CloudWatch
 
 Supports all adapters available on [chainlink/adapters](https://gallery.ecr.aws/?searchTerm=chainlink%2Fadapters).
@@ -138,7 +139,7 @@ Check an exhausive example in [basic secrets example](./examples/basic_secrets/m
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 4.65.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 4.40.0 |
 | <a name="provider_external"></a> [external](#provider\_external) | 2.2.3 |
 
 ## Modules
