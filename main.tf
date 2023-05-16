@@ -5,14 +5,12 @@ locals {
   external_adapters = flatten([
     for key, value in var.external_adapters : [{
       name                    = key
-      custom_task_definition  = lookup(value, "custom", "false")
       version                 = lookup(value, "version", "auto")
       rate_limit_enabled      = lookup(value, "rate_limit_enabled", "true")
       rate_limit_api_provider = lookup(value, "rate_limit_api_provider", key)
       rate_limit_api_tier     = lookup(value, "rate_limit_api_tier", "")
       ea_port                 = lookup(value, "app_port", 8080)
-      alb_port                = lookup(value, "alb_port", null)
-      health_path             = lookup(value, "health_path", "/health")
+      metrics_port            = lookup(value, "metrics_port", 9080)
       cpu                     = lookup(value, "cpu", 256)
       memory                  = lookup(value, "memory", 512)
       cache_enabled           = lookup(value, "cache_enabled", "true")
@@ -84,6 +82,7 @@ resource "aws_ecs_task_definition" "this" {
       docker_tag              = each.value.version == "auto" ? data.external.latest_version[each.value.name].result.latest_version : each.value.version
       aws_region              = var.aws_region
       ea_port                 = each.value.ea_port
+      metrics_port            = each.value.metrics_port
       cpu                     = each.value.cpu
       memory                  = each.value.memory
       cache_enabled           = each.value.cache_enabled
@@ -124,6 +123,12 @@ resource "aws_ecs_service" "this" {
     target_group_arn = aws_lb_target_group.ea[each.value.name].arn
     container_name   = "${var.project}-${var.environment}-${each.value.name}"
     container_port   = each.value.ea_port
+  }
+
+  load_balancer {
+    target_group_arn = aws_lb_target_group.ea_metrics[each.value.name].arn
+    container_name   = "${var.project}-${var.environment}-${each.value.name}"
+    container_port   = each.value.metrics_port
   }
 }
 

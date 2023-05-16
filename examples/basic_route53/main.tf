@@ -50,6 +50,11 @@ module "chainlink_ea" {
       }
     }
   }
+
+  route53_enabled        = true
+  route53_domain_name    = "domain_name.com" # Should be equal to your Route53 Hosted Zone name
+  route53_subdomain_name = "bridge"          # Will be used to create Route53 record to ALB endpoint with the following format "${var.route53_subdomain_name}.${var.route53_domain_name}"
+  route53_zoneid         = "your_zoneid"     # Route53 hosted zone ID. Nameservers of your zone should be added to your domain registrar before creation. It will be used to create record to ALB and verify ACM certificate using DNS.
 }
 
 resource "aws_security_group_rule" "allow_all" {

@@ -30,28 +30,22 @@ module "vpc" {
 module "chainlink_ea" {
   source = "../../."
 
-  project     = "example"
-  environment = "nonprod"
-
-  aws_region     = "eu-west-1"
-  aws_account_id = data.aws_caller_identity.current.account_id
-
+  project             = "example"
+  environment         = "nonprod"
+  aws_region          = "eu-west-1"
+  aws_account_id      = data.aws_caller_identity.current.account_id
   vpc_id              = module.vpc.vpc_id
-  vpc_cidr_block      = module.vpc.vpc_cidr_block
+  vpc_public_subnets  = module.vpc.public_subnets
   vpc_private_subnets = module.vpc.private_subnets
 
   external_adapters = {
     coingecko = {
-      rate_limit_api_tier = "analyst"
-      alb_port            = "1113"
       ea_secret_variables = {
         API_KEY        = "API_KEY_VALUE"    # Value of AWS SM object will be set to "API_KEY_VALUE"
         SECRET_VAR_KEY = "SECRET_VAR_VALUE" # Value of AWS SM object will be set to "SECRET_VAR_VALUE"
       }
     }
     bank-frick = {
-      rate_limit_api_tier = "production"
-      alb_port            = "1182"
       ea_specific_variables = {
         PAGE_SIZE    = "500"
         API_ENDPOINT = "API_ENDPOINT_VALUE"
@@ -62,4 +56,15 @@ module "chainlink_ea" {
       }
     }
   }
+}
+
+resource "aws_security_group_rule" "allow_all" {
+  type        = "ingress"
+  from_port   = 0
+  to_port     = 0
+  protocol    = "-1"
+  cidr_blocks = ["0.0.0.0/0"]
+  description = "Allow all traffic"
+
+  security_group_id = module.chainlink_ea.alb_security_group_id
 }
