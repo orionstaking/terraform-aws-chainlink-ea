@@ -41,21 +41,20 @@ module "chainlink_ea" {
   external_adapters = {
     coingecko = {
       ea_secret_variables = {
-        API_KEY        = "API_KEY_VALUE"    # Value of AWS SM object will be set to "API_KEY_VALUE"
-        SECRET_VAR_KEY = "SECRET_VAR_VALUE" # Value of AWS SM object will be set to "SECRET_VAR_VALUE"
+        API_KEY = "API_KEY_VALUE" # https://www.coingecko.com/en/developers/dashboard
       }
     }
-    bank-frick = {
-      ea_specific_variables = {
-        PAGE_SIZE    = "500"
-        API_ENDPOINT = "API_ENDPOINT_VALUE"
-      }
+    tiingo = {
       ea_secret_variables = {
-        API_KEY     = "" # If leave an empty string, value of AWS SM object won't be set. You'll need to set a value manually
-        PRIVATE_KEY = "" # If leave an empty string, value of AWS SM object won't be set. You'll need to set a value manually
+        API_KEY = "API_KEY_VALUE" # https://api.tiingo.com/account/profile
       }
     }
   }
+
+  route53_enabled        = true
+  route53_domain_name    = "domain_name.com" # Should be equal to your Route53 Hosted Zone name
+  route53_subdomain_name = "bridge"          # Will be used to create Route53 record to ALB endpoint with the following format "${var.route53_subdomain_name}.${var.route53_domain_name}"
+  route53_zoneid         = "your_zoneid"     # Route53 hosted zone ID. Nameservers of your zone should be added to your domain registrar before creation. It will be used to create record to ALB and verify ACM certificate using DNS.
 }
 
 resource "aws_security_group_rule" "allow_all" {

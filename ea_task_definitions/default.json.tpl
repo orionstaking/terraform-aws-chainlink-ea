@@ -28,7 +28,9 @@
         %{ endif }
         { "name" : "RATE_LIMIT_ENABLED", "value" : "${rate_limit_enabled}" },
         { "name" : "RATE_LIMIT_API_PROVIDER", "value" : "${rate_limit_api_provider}" },
+        %{ if rate_limit_api_tier != "" }
         { "name" : "RATE_LIMIT_API_TIER", "value" : "${rate_limit_api_tier}" },
+        %{ endif }
         %{~ for definition in ea_specific_variables ~}
         { "name" : "${definition.name}", "value" : "${definition.value}" },
         %{~ endfor ~}

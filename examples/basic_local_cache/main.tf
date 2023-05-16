@@ -30,30 +30,35 @@ module "vpc" {
 module "chainlink_ea" {
   source = "../../."
 
-  project     = "example"
-  environment = "nonprod"
-
-  aws_region     = "eu-west-1"
-  aws_account_id = data.aws_caller_identity.current.account_id
-
+  project             = "example"
+  environment         = "nonprod"
+  aws_region          = "eu-west-1"
+  aws_account_id      = data.aws_caller_identity.current.account_id
   vpc_id              = module.vpc.vpc_id
   vpc_cidr_block      = module.vpc.vpc_cidr_block
   vpc_private_subnets = module.vpc.private_subnets
 
   external_adapters = {
     coingecko = {
-      rate_limit_api_tier = "analyst"
-      alb_port            = "1113"
       ea_secret_variables = {
         API_KEY = "API_KEY_VALUE" # https://www.coingecko.com/en/developers/dashboard
       }
     }
     tiingo = {
-      rate_limit_api_tier = "power"
-      alb_port            = "1134"
       ea_secret_variables = {
         API_KEY = "API_KEY_VALUE" # https://api.tiingo.com/account/profile
       }
     }
   }
+}
+
+resource "aws_security_group_rule" "allow_all" {
+  type        = "ingress"
+  from_port   = 0
+  to_port     = 0
+  protocol    = "-1"
+  cidr_blocks = ["0.0.0.0/0"]
+  description = "Allow all traffic"
+
+  security_group_id = module.chainlink_ea.alb_security_group_id
 }

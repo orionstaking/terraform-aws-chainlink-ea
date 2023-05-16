@@ -5,7 +5,6 @@ locals {
   external_adapters = flatten([
     for key, value in var.external_adapters : [{
       name                    = key
-      custom_task_definition  = lookup(value, "custom", "false")
       version                 = lookup(value, "version", "auto")
       rate_limit_enabled      = lookup(value, "rate_limit_enabled", "true")
       rate_limit_api_provider = lookup(value, "rate_limit_api_provider", key)
