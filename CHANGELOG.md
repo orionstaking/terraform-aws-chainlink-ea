@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.0](https://github.com/orionstaking/terraform-aws-chainlink-ea/compare/v1.6.0...v2.0.0) (2023-05-16)
+
+
+### ⚠ BREAKING CHANGES
+
+* Path based routing and HTTPS support (#8)
+
+### Features
+
+* Path based routing and HTTPS support ([#8](https://github.com/orionstaking/terraform-aws-chainlink-ea/issues/8)) ([8a965be](https://github.com/orionstaking/terraform-aws-chainlink-ea/commit/8a965be3cdf15633e246b5b482f650bec39982ac))
+
 ## [1.6.0](https://github.com/orionstaking/terraform-aws-chainlink-ea/compare/v1.5.0...v1.6.0) (2023-03-16)
 
 
