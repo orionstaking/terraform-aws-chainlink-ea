@@ -85,7 +85,7 @@ With basic example above you can access adapters using the following URL's:
 - tiingo - http(s)://${ALB_DOMAIN_NAME}/tiingo
 - tiingo metrics - http(s)://${ALB_DOMAIN_NAME}/tiingo/metrics
 
-### ACCESS
+### ALB access
 
 Module creates AWS Security Group for ALB with only egress connections allowed. In order to accept incoming connections, it is required to add rules to that Security Group using `aws_security_group_rule` resource.
 
