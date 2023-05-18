@@ -6,12 +6,12 @@ Terraform module which creates AWS infra for Chainlink External Adapters:
   - AWS Secrets Manager (to store API keys and other secrets)
   - AWS Route53&ACM
   - AWS IAM
-  - AWS MemoryDB (if Redis cache is enabled)
-  - AWS CloudWatch
+  - AWS MemoryDB (optional, if Redis cache is enabled)
+  - AWS CloudWatch (optional, if monitoring is enabled)
 
 Supports all adapters available on [chainlink/adapters](https://gallery.ecr.aws/?searchTerm=chainlink%2Fadapters).
 
-Terraform module for Chainlink Node: [here](https://github.com/orionterra/terraform-aws-chainlink-node)
+Module could be used independently or together with [Chainlink Node module](https://github.com/orionterra/terraform-aws-chainlink-node)
 
 ## Architecture overview
 
