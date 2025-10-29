@@ -13,7 +13,7 @@ resource "aws_lb" "this" {
 resource "aws_lb_target_group" "ea" {
   for_each = { for ea in local.external_adapters : ea.name => ea }
 
-  name                 = trim(substr("${var.project}-${var.environment}-${each.value.name}", 0, 32), "-")
+  name                 = each.value.alb_target_group_name != null ? each.value.alb_target_group_name : trim(substr("${var.project}-${var.environment}-${each.value.name}", 0, 32), "-")
   port                 = each.value.ea_port
   protocol             = "HTTP"
   target_type          = "ip"
@@ -36,7 +36,7 @@ resource "aws_lb_target_group" "ea" {
 resource "aws_lb_target_group" "ea_metrics" {
   for_each = { for ea in local.external_adapters : ea.name => ea }
 
-  name                 = trim(substr("m-${var.project}-${var.environment}-${each.value.name}", 0, 32), "-")
+  name                 = each.value.alb_target_group_name != null ? "m-${each.value.alb_target_group_name}" : trim(substr("m-${var.project}-${var.environment}-${each.value.name}", 0, 32), "-")
   port                 = each.value.metrics_port
   protocol             = "HTTP"
   target_type          = "ip"

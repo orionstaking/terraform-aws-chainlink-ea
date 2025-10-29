@@ -18,6 +18,7 @@ locals {
       cache_key_group         = lookup(value, "cache_key_group", key)
       log_level               = lookup(value, "log_level", "info")
       alarms_disabled         = lookup(value, "alarms_disabled", "false")
+      alb_target_group_name   = lookup(value, "alb_target_group_name", null)
 
       ea_specific_variables = flatten([
         for spec_var_key, spec_var_value in lookup(value, "ea_specific_variables", {}) : [{

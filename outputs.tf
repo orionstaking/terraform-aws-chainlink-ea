@@ -17,3 +17,14 @@ output "alb_security_group_id" {
   description = "ID of security group attached to ALB. Used to configure additional rules. ALB has restricted access by default"
   value       = aws_security_group.alb_sg.id
 }
+
+output "deployed_adapters" {
+  description = "Map of all deployed external adapters with their names and versions"
+  value = {
+    for ea_name, ea_config in var.external_adapters : ea_name => {
+      name    = ea_name
+      version = lookup(ea_config, "version", "auto") == "auto" ? data.external.latest_version[ea_name].result.latest_version : lookup(ea_config, "version", "auto")
+      image   = "public.ecr.aws/chainlink/adapters/${ea_name}-adapter:${lookup(ea_config, "version", "auto") == "auto" ? data.external.latest_version[ea_name].result.latest_version : lookup(ea_config, "version", "auto")}"
+    }
+  }
+}
