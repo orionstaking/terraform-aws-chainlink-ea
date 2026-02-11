@@ -110,6 +110,23 @@ resource "aws_lb_listener_rule" "static" {
   }
 }
 
+resource "aws_lb_listener_rule" "status" {
+  for_each = { for ea in local.external_adapters : ea.name => ea }
+
+  listener_arn = var.route53_enabled ? aws_lb_listener.ea_secure[0].arn : aws_lb_listener.ea[0].arn
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.ea[each.value.name].arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/${each.value.name}/status"]
+    }
+  }
+}
+
 resource "aws_lb_listener_rule" "static_metrics" {
   for_each = { for ea in local.external_adapters : ea.name => ea }
 
