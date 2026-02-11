@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.1.0](https://github.com/orionstaking/terraform-aws-chainlink-ea/compare/v2.0.0...v2.1.0) (2026-02-11)
+
+
+### Features
+
+* added ALB rule for adapter's status path ([e37910d](https://github.com/orionstaking/terraform-aws-chainlink-ea/commit/e37910d614a1bc7e6e43a778bf2b284e1e8d36be))
+
 ## [2.0.0](https://github.com/orionstaking/terraform-aws-chainlink-ea/compare/v1.6.0...v2.0.0) (2023-05-16)
 
 
