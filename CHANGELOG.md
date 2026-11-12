@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.0.0](https://github.com/orionstaking/terraform-aws-chainlink-ea/compare/v2.1.0...v3.0.0) (2026-11-12)
+
+### ⚠ BREAKING CHANGES
+
+* Read adapter secrets from Parameter Store (#11)
+
+### Features
+
+* Read adapter secrets from Parameter Store ([#11](https://github.com/orionstaking/terraform-aws-chainlink-ea/issues/11)) ([4b004a0](https://github.com/orionstaking/terraform-aws-chainlink-ea/commit/4b004a067e2c61827d01f4ab3fe58555c7bef1aa))
+
 ## [2.1.0](https://github.com/orionstaking/terraform-aws-chainlink-ea/compare/v2.0.0...v2.1.0) (2026-02-11)
 
 
