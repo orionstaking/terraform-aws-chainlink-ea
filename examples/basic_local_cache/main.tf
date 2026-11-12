@@ -15,7 +15,8 @@ provider "aws" {
 data "aws_caller_identity" "current" {}
 
 module "vpc" {
-  source = "terraform-aws-modules/vpc/aws"
+  source  = "terraform-aws-modules/vpc/aws"
+  version = "~> 6.0"
 
   name = "my-vpc"
   cidr = "10.0.0.0/16"
@@ -40,14 +41,10 @@ module "chainlink_ea" {
 
   external_adapters = {
     coingecko = {
-      ea_secret_variables = {
-        API_KEY = "API_KEY_VALUE" # https://www.coingecko.com/en/developers/dashboard
-      }
+      ea_secret_parameters = ["API_KEY"]
     }
     tiingo = {
-      ea_secret_variables = {
-        API_KEY = "API_KEY_VALUE" # https://api.tiingo.com/account/profile
-      }
+      ea_secret_parameters = ["API_KEY"]
     }
   }
 }

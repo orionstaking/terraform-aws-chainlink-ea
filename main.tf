@@ -27,16 +27,63 @@ locals {
         }]
       ])
 
-      ea_secret_variables = flatten([
-        for spec_sec_var_key, spec_sec_var_value in lookup(value, "ea_secret_variables", {}) : [{
-          secret_name  = spec_sec_var_key
-          secret_value = spec_sec_var_value
-        }]
-      ])
+      ea_secret_parameters = try(tolist(lookup(value, "ea_secret_parameters", [])), [])
     }]
   ])
 
+  legacy_secret_adapters = [
+    for name, cfg in var.external_adapters : name
+    if contains(keys(cfg), "ea_secret_variables")
+  ]
+
+  non_list_secret_parameters = [
+    for name, cfg in var.external_adapters : name
+    if contains(keys(cfg), "ea_secret_parameters") && !can(tolist(lookup(cfg, "ea_secret_parameters", [])))
+  ]
+
+  secret_specific_overlap = flatten([
+    for name, cfg in var.external_adapters : [
+      for secret_name in try(tolist(lookup(cfg, "ea_secret_parameters", [])), []) : "${name}/${secret_name}"
+      if contains(keys(lookup(cfg, "ea_specific_variables", {})), secret_name)
+    ]
+  ])
+
+  invalid_secret_parameter_names = flatten([
+    for name, cfg in var.external_adapters : [
+      for secret_name in try(tolist(lookup(cfg, "ea_secret_parameters", [])), []) : "${name}/${secret_name}"
+      if !can(regex("^[A-Za-z_][A-Za-z0-9_]*$", secret_name))
+    ] if can(tolist(lookup(cfg, "ea_secret_parameters", [])))
+  ])
+
+  duplicate_secret_parameters = [
+    for name, cfg in var.external_adapters : name
+    if can(tolist(lookup(cfg, "ea_secret_parameters", []))) && length(distinct(tolist(lookup(cfg, "ea_secret_parameters", [])))) != length(tolist(lookup(cfg, "ea_secret_parameters", [])))
+  ]
+
+  secret_parameter_names = flatten([
+    for ea in local.external_adapters : [
+      for parameter_name in ea.ea_secret_parameters : "/${var.project}/${var.environment}/ea/${ea.name}/${parameter_name}"
+    ]
+  ])
+
+  secret_parameter_arns = [
+    for parameter_name in local.secret_parameter_names : "arn:aws:ssm:${var.aws_region}:${var.aws_account_id}:parameter${parameter_name}"
+  ]
+
+  ea_secret_parameters_ready = length(local.secret_parameter_names) == 0 ? true : data.external.ea_secret_parameters[0].result.ok == "true"
+
   container_insights_monitoring = var.monitoring_enabled ? "enabled" : "disabled"
+}
+
+data "external" "ea_secret_parameters" {
+  count = length(local.secret_parameter_names) == 0 ? 0 : 1
+
+  program = ["python3", "${path.module}/check_ssm_parameters.py"]
+
+  query = {
+    region = var.aws_region
+    names  = jsonencode(local.secret_parameter_names)
+  }
 }
 
 data "external" "latest_version" {
@@ -54,6 +101,29 @@ resource "aws_ecs_cluster" "this" {
   setting {
     name  = "containerInsights"
     value = local.container_insights_monitoring
+  }
+
+  lifecycle {
+    precondition {
+      condition     = length(local.legacy_secret_adapters) == 0
+      error_message = "ea_secret_variables was removed in v3. Move secret names to ea_secret_parameters and create a SecureString at /${var.project}/${var.environment}/ea/<adapter>/<NAME> before apply. Still set on: ${join(", ", local.legacy_secret_adapters)}."
+    }
+    precondition {
+      condition     = length(local.non_list_secret_parameters) == 0
+      error_message = "ea_secret_parameters must be a list of environment variable names. Still a map or other type on: ${join(", ", local.non_list_secret_parameters)}."
+    }
+    precondition {
+      condition     = length(local.secret_specific_overlap) == 0
+      error_message = "A name cannot be both an ea_specific_variables entry and an ea_secret_parameters entry: ${join(", ", local.secret_specific_overlap)}."
+    }
+    precondition {
+      condition     = length(local.invalid_secret_parameter_names) == 0
+      error_message = "ea_secret_parameters names must match [A-Za-z_][A-Za-z0-9_]*: ${join(", ", local.invalid_secret_parameter_names)}."
+    }
+    precondition {
+      condition     = length(local.duplicate_secret_parameters) == 0
+      error_message = "ea_secret_parameters contains duplicate names for: ${join(", ", local.duplicate_secret_parameters)}."
+    }
   }
 }
 
@@ -93,9 +163,21 @@ resource "aws_ecs_task_definition" "this" {
       cache_key_group         = each.value.cache_key_group
       log_level               = each.value.log_level
       ea_specific_variables   = each.value.ea_specific_variables
-      ea_secret_variables     = module.ea_secrets[each.value.name].secrets
+      ea_secret_parameters = [
+        for parameter_name in each.value.ea_secret_parameters : {
+          name      = parameter_name
+          valueFrom = "arn:aws:ssm:${var.aws_region}:${var.aws_account_id}:parameter/${var.project}/${var.environment}/ea/${each.value.name}/${parameter_name}"
+        }
+      ]
     }
   )
+
+  lifecycle {
+    precondition {
+      condition     = local.ea_secret_parameters_ready
+      error_message = "One or more SSM parameters from ea_secret_parameters are missing or are not SecureString."
+    }
+  }
 }
 
 # ECS service

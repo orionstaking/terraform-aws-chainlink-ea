@@ -3,7 +3,7 @@
 Terraform module which creates AWS infra for Chainlink External Adapters:
   - AWS Fargate
   - AWS Application Load Balancer
-  - AWS Secrets Manager (to store API keys and other secrets)
+  - AWS Systems Manager Parameter Store (to store API keys and other secrets)
   - AWS Route53&ACM
   - AWS IAM
   - AWS MemoryDB (optional, if Redis cache is enabled)
@@ -42,14 +42,11 @@ module "chainlink_ea" {
 
   external_adapters = {
     coingecko = {
-      ea_secret_variables = {
-        API_KEY = "API_KEY_VALUE" # https://www.coingecko.com/en/developers/dashboard
-      }
+      # Create /example/nonprod/ea/coingecko/API_KEY in Parameter Store before apply.
+      ea_secret_parameters = ["API_KEY"]
     }
     tiingo = {
-      ea_secret_variables = {
-        API_KEY = "API_KEY_VALUE" # https://api.tiingo.com/account/profile
-      }
+      ea_secret_parameters = ["API_KEY"]
     }
   }
 }
@@ -72,7 +69,7 @@ List of Chainlink EA's supported environment variables that could be specified u
 
 Any other specific or non-default variable could be set using `ea_specific_variables` variable in `external_adapters` block. Please check available options [here](https://github.com/smartcontractkit/external-adapters-js/tree/develop/packages/core/bootstrap#server-configuration) and usage examples in examples directory.
 
-For any secret variable please use `ea_secret_variables` variable in `external_adapters` block. Please check examples in examples directory.
+For any secret variable, list its name in `ea_secret_parameters`. Do not put the value in Terraform. A name that is also present in `ea_specific_variables` is rejected, so a secret cannot be passed to the task as plain text.
 
 ## Notes
 
@@ -98,40 +95,45 @@ Module support configuration of AWS Route53 and ACM services to secure connectio
 
 - AWS Route53&ACM (recommended). This option requires configured Route53 hosted zone to create records for AWS ALB and AWS ACM certificate validation. Check example [here](./examples/basic_route53/main.tf).
 
-### AWS Secrets Manager
+### Parameter Store
 
-AWS Secrets Manager is used to keep all secret values required for an External Adapter. By default, when secret value is specified in terraform configuration, module will create AWS SM object with it's value. Then this value will be connected to ECS task.
+Secret values are SecureString parameters. Terraform stores only the parameter name and passes its ARN to the ECS task definition. `plan` checks that every listed parameter already exists and is a SecureString. The check uses `DescribeParameters`, so the value is not written to state.
 
-#### AWS Secrets Manager without storing secrets in terraform state in plain text (!OPTIONAL)
+The parameter path is `/${project}/${environment}/ea/<adapter>/<ENV_NAME>`.
 
-There is an ability to create empty AWS Secrets Manager objects that will be connected to ECS Fargate task. This action will prevent storing secrets in terraform state files in plain text.
+```bash
+aws ssm put-parameter \
+  --name "/example/nonprod/ea/coingecko/API_KEY" \
+  --type SecureString \
+  --value "..."
+```
 
-The list of required actions:
-  - Leave all secret variables veriables in `ea_secret_variables` with an empty string like `""`. Check an exhausive example in .examples/basic_secrets folder.
-  - Run `terraform apply`
-  - Manually update created AWS SM objects (using AWS Console/CLI/etc.)
-  - Restart related External Adapters in ECS (using AWS Console/CLI/etc.) to update them with new values from AWS SM objects.
+Create the parameter before apply. Changing it later is another `put-parameter` and a new ECS deployment. Terraform does not update the value.
 
-#### Additional (non default) secrets required for an External Adapter
+`ea_specific_variables` is for settings that are not secrets. If the same name is listed in both places, `plan` fails.
 
-In most cases all External adapters are needed to store only API_KEY environment variable in AWS SM.
+### Upgrading from v2
 
-Sometimes, an External Adapter like [bank-frick](https://github.com/smartcontractkit/external-adapters-js/tree/develop/packages/sources/bank-frick) is required more sensetive variables than just API_KEY. In this case, it's possible to include all required values in `ea_secret_variables` block in `external_adapters` variable.
+v3 removes `ea_secret_variables` and no longer creates Secrets Manager secrets. Terraform stores parameter names only.
 
-Check an exhausive example in [basic secrets example](./examples/basic_secrets/main.tf) folder.
+- List each secret environment variable in `ea_secret_parameters`.
+- Create a SecureString at `/${project}/${environment}/ea/<adapter>/<NAME>` before apply.
+- Leave non-secret settings in `ea_specific_variables`. The same name cannot be in both places.
+- Terraform 1.2.0 or newer is required. The CI minimum job uses that version, and the maximum job uses the newest Terraform release allowed by `required_version`.
 
 ## Examples
 
 - [Basic example with local cache](./examples/basic_local_cache/main.tf)
+- [Basic example with Parameter Store](./examples/basic_secrets/main.tf)
+- [Basic example with Route53 and ACM](./examples/basic_route53/main.tf)
 - [Complete example with MemoryDB](./examples/complete_memorydb_redis/main.tf)
-- [Basic example with AWS SM usage](./examples/basic_specific_secrets/main.tf)
 
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0.0 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.2.0 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 4.40.0 |
 | <a name="requirement_external"></a> [external](#requirement\_external) | 2.2.3 |
 
@@ -147,7 +149,6 @@ Check an exhausive example in [basic secrets example](./examples/basic_secrets/m
 | Name | Source | Version |
 |------|--------|---------|
 | <a name="module_acm"></a> [acm](#module\_acm) | terraform-aws-modules/acm/aws | ~> 4.0 |
-| <a name="module_ea_secrets"></a> [ea\_secrets](#module\_ea\_secrets) | ./modules/ea_secrets | n/a |
 
 ## Resources
 
@@ -165,14 +166,17 @@ Check an exhausive example in [basic secrets example](./examples/basic_secrets/m
 | [aws_ecs_cluster.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ecs_cluster) | resource |
 | [aws_ecs_service.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ecs_service) | resource |
 | [aws_ecs_task_definition.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ecs_task_definition) | resource |
+| [aws_iam_policy.ea_parameters](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
 | [aws_iam_policy.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
 | [aws_iam_role.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
+| [aws_iam_role_policy_attachment.ea_parameters](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
 | [aws_iam_role_policy_attachment.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
 | [aws_lb.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb) | resource |
 | [aws_lb_listener.ea](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_listener) | resource |
 | [aws_lb_listener.ea_secure](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_listener) | resource |
 | [aws_lb_listener_rule.static](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_listener_rule) | resource |
 | [aws_lb_listener_rule.static_metrics](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_listener_rule) | resource |
+| [aws_lb_listener_rule.status](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_listener_rule) | resource |
 | [aws_lb_target_group.ea](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_target_group) | resource |
 | [aws_lb_target_group.ea_metrics](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_target_group) | resource |
 | [aws_memorydb_cluster.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/memorydb_cluster) | resource |
@@ -188,7 +192,10 @@ Check an exhausive example in [basic secrets example](./examples/basic_secrets/m
 | [aws_security_group_rule.ingress_allow_self](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) | resource |
 | [aws_security_group_rule.ingress_mem_allow_self](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) | resource |
 | [aws_sns_topic.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/sns_topic) | resource |
+| [aws_iam_policy_document.ea_parameters](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [aws_iam_policy_document.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
+| [aws_kms_alias.ssm](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/kms_alias) | data source |
+| [external_external.ea_secret_parameters](https://registry.terraform.io/providers/hashicorp/external/2.2.3/docs/data-sources/external) | data source |
 | [external_external.latest_version](https://registry.terraform.io/providers/hashicorp/external/2.2.3/docs/data-sources/external) | data source |
 
 ## Inputs
@@ -201,7 +208,7 @@ Check an exhausive example in [basic secrets example](./examples/basic_secrets/m
 | <a name="input_ea_desired_task_count"></a> [ea\_desired\_task\_count](#input\_ea\_desired\_task\_count) | Number of instances of the task definition to place and keep running | `number` | `1` | no |
 | <a name="input_elb_alarms_enabled"></a> [elb\_alarms\_enabled](#input\_elb\_alarms\_enabled) | Defines whether to create CloudWatch alarms of 4XX and 5XX status codes on ALB or not. Alarms will be created only if `monitoring_enabled` variable is set to `true` | `bool` | `false` | no |
 | <a name="input_environment"></a> [environment](#input\_environment) | Environment name | `string` | `"nonprod"` | no |
-| <a name="input_external_adapters"></a> [external\_adapters](#input\_external\_adapters) | Map of external adapters that needs to be deployed. See example in ./examples/complete\_memorydb\_redis | `any` | `{}` | no |
+| <a name="input_external_adapters"></a> [external\_adapters](#input\_external\_adapters) | Map of external adapters that needs to be deployed. Non-secret settings go in ea\_specific\_variables. Secret environment variable names go in ea\_secret\_parameters; the values live in SSM Parameter Store. See example in ./examples/basic\_secrets | `any` | `{}` | no |
 | <a name="input_memorydb_node_type"></a> [memorydb\_node\_type](#input\_memorydb\_node\_type) | The compute and memory capacity of the nodes in the cluster | `string` | `"db.t4g.small"` | no |
 | <a name="input_memorydb_num_replicas_per_shard"></a> [memorydb\_num\_replicas\_per\_shard](#input\_memorydb\_num\_replicas\_per\_shard) | The number of replicas to apply to each shard, up to a maximum of 5 | `number` | `0` | no |
 | <a name="input_memorydb_shards_count"></a> [memorydb\_shards\_count](#input\_memorydb\_shards\_count) | The number of shards in the cluster | `number` | `1` | no |
@@ -225,6 +232,8 @@ Check an exhausive example in [basic secrets example](./examples/basic_secrets/m
 | <a name="output_chainlink_ea_load_balancer"></a> [chainlink\_ea\_load\_balancer](#output\_chainlink\_ea\_load\_balancer) | Internal ALB endpoint to accress EA's |
 | <a name="output_chainlink_ea_memory_db_address"></a> [chainlink\_ea\_memory\_db\_address](#output\_chainlink\_ea\_memory\_db\_address) | DNS hostname of the cluster configuration endpoint |
 | <a name="output_chainlink_ea_memory_db_port"></a> [chainlink\_ea\_memory\_db\_port](#output\_chainlink\_ea\_memory\_db\_port) | Port number that the cluster configuration endpoint is listening on |
+| <a name="output_deployed_adapters"></a> [deployed\_adapters](#output\_deployed\_adapters) | Map of all deployed external adapters with their names and versions |
+| <a name="output_ea_secret_parameter_names"></a> [ea\_secret\_parameter\_names](#output\_ea\_secret\_parameter\_names) | SSM Parameter Store names the task execution role reads for ea\_secret\_parameters |
 <!-- END_TF_DOCS -->
 
 ## License

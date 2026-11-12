@@ -7,6 +7,7 @@ on:
 
 env:
   TERRAFORM_DOCS_VERSION: v0.16.0
+  TFLINT_VERSION: v0.66.0
 
 jobs:
   getDirectories:
@@ -16,14 +17,31 @@ jobs:
       directories: ${{ steps.search.outputs.directories }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
 
-      - name: Sign AWS Lambda artifact
-        uses: clowdhaus/terraform-composite-actions/directories@main
+      - name: Get Terraform directories
         id: search
+        run: |
+          dirs=$(python3 - <<'PY'
+          import glob
+          import json
+          import os
 
-      - name: Output directories
-        run: echo "${{ steps.search.outputs.directories }}"
+          found = []
+          for file in glob.glob("./**/*.tf", recursive=True):
+              if not os.path.isfile(file) or os.path.getsize(file) == 0 or "wrapper" in file:
+                  continue
+              with open(file, "rb") as handle:
+                  if b"required_version" not in handle.read():
+                      continue
+              parent = "/".join(file.split("/")[:-1])
+              if parent not in found:
+                  found.append(parent)
+          print(json.dumps(found))
+          PY
+          )
+          echo "$dirs"
+          echo "directories=$dirs" >> "$GITHUB_OUTPUT"
 
   validateTerraformMin:
     name: TF validate with Min version
@@ -34,32 +52,30 @@ jobs:
         directory: ${{ fromJson(needs.getDirectories.outputs.directories) }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
 
       - name: Terraform min/max versions
         id: minMax
-        uses: clowdhaus/terraform-min-max@v1.2.4
+        uses: clowdhaus/terraform-min-max@v3.0.1
         with:
           directory: ${{ matrix.directory }}
 
       - name: Pre-commit Terraform ${{ steps.minMax.outputs.minVersion }}
-        uses: clowdhaus/terraform-composite-actions/pre-commit@v1.8.3
+        uses: clowdhaus/terraform-composite-actions/pre-commit@v1.14.0
         if: ${{ matrix.directory !=  '.' }}
         with:
           terraform-version: ${{ steps.minMax.outputs.minVersion }}
           terraform-docs-version: ${{ env.TERRAFORM_DOCS_VERSION }}
-          install-hcledit: true
-          hcledit-version: 0.2.6
+          tflint-version: ${{ env.TFLINT_VERSION }}
           args: "--color=always --show-diff-on-failure --files ${{ matrix.directory }}/*"
 
       - name: Pre-commit Terraform ${{ steps.minMax.outputs.minVersion }}
-        uses: clowdhaus/terraform-composite-actions/pre-commit@v1.8.3
+        uses: clowdhaus/terraform-composite-actions/pre-commit@v1.14.0
         if: ${{ matrix.directory ==  '.' }}
         with:
           terraform-version: ${{ steps.minMax.outputs.minVersion }}
           terraform-docs-version: ${{ env.TERRAFORM_DOCS_VERSION }}
-          install-hcledit: true
-          hcledit-version: 0.2.6
+          tflint-version: ${{ env.TFLINT_VERSION }}
           args: "--color=always --show-diff-on-failure --files $(ls *.tf)"
 
   validateTerraformMax:
@@ -71,28 +87,28 @@ jobs:
         directory: ${{ fromJson(needs.getDirectories.outputs.directories) }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
 
       - name: Terraform min/max versions
         id: minMax
-        uses: clowdhaus/terraform-min-max@v1.2.4
+        uses: clowdhaus/terraform-min-max@v3.0.1
+        with:
+          directory: ${{ matrix.directory }}
 
       - name: Pre-commit Terraform ${{ steps.minMax.outputs.maxVersion }}
-        uses: clowdhaus/terraform-composite-actions/pre-commit@v1.8.3
+        uses: clowdhaus/terraform-composite-actions/pre-commit@v1.14.0
         if: ${{ matrix.directory !=  '.' }}
         with:
           terraform-version: ${{ steps.minMax.outputs.maxVersion }}
           terraform-docs-version: ${{ env.TERRAFORM_DOCS_VERSION }}
-          install-hcledit: true
-          hcledit-version: 0.2.6
+          tflint-version: ${{ env.TFLINT_VERSION }}
           args: "--color=always --show-diff-on-failure --files ${{ matrix.directory }}/*"
 
       - name: Pre-commit Terraform ${{ steps.minMax.outputs.maxVersion }}
-        uses: clowdhaus/terraform-composite-actions/pre-commit@v1.8.3
+        uses: clowdhaus/terraform-composite-actions/pre-commit@v1.14.0
         if: ${{ matrix.directory ==  '.' }}
         with:
           terraform-version: ${{ steps.minMax.outputs.maxVersion }}
           terraform-docs-version: ${{ env.TERRAFORM_DOCS_VERSION }}
-          install-hcledit: true
-          hcledit-version: 0.2.6
+          tflint-version: ${{ env.TFLINT_VERSION }}
           args: "--color=always --show-diff-on-failure --files $(ls *.tf)"

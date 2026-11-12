@@ -35,7 +35,7 @@ variable "vpc_private_subnets" {
 }
 
 variable "external_adapters" {
-  description = "Map of external adapters that needs to be deployed. See example in ./examples/complete_memorydb_redis"
+  description = "Map of external adapters that needs to be deployed. Non-secret settings go in ea_specific_variables. Secret environment variable names go in ea_secret_parameters; the values live in SSM Parameter Store. See example in ./examples/basic_secrets"
   default     = {}
   type        = any
 }

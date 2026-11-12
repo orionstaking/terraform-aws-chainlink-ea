@@ -15,7 +15,8 @@ provider "aws" {
 data "aws_caller_identity" "current" {}
 
 module "vpc" {
-  source = "terraform-aws-modules/vpc/aws"
+  source  = "terraform-aws-modules/vpc/aws"
+  version = "~> 6.0"
 
   name = "my-vpc"
   cidr = "10.0.0.0/16"
@@ -40,20 +41,18 @@ module "chainlink_ea" {
 
   external_adapters = {
     coingecko = {
-      ea_secret_variables = {
-        API_KEY        = "API_KEY_VALUE"    # Value of AWS SM object will be set to "API_KEY_VALUE"
-        SECRET_VAR_KEY = "SECRET_VAR_VALUE" # Value of AWS SM object will be set to "SECRET_VAR_VALUE"
-      }
+      # /example/nonprod/ea/coingecko/API_KEY
+      # /example/nonprod/ea/coingecko/SECRET_VAR_KEY
+      ea_secret_parameters = ["API_KEY", "SECRET_VAR_KEY"]
     }
     bank-frick = {
       ea_specific_variables = {
         PAGE_SIZE    = "500"
         API_ENDPOINT = "API_ENDPOINT_VALUE"
       }
-      ea_secret_variables = {
-        API_KEY     = "" # If leave an empty string, value of AWS SM object won't be set. You'll need to set a value manually
-        PRIVATE_KEY = "" # If leave an empty string, value of AWS SM object won't be set. You'll need to set a value manually
-      }
+      # /example/nonprod/ea/bank-frick/API_KEY
+      # /example/nonprod/ea/bank-frick/PRIVATE_KEY
+      ea_secret_parameters = ["API_KEY", "PRIVATE_KEY"]
     }
   }
 }

@@ -15,7 +15,8 @@ provider "aws" {
 data "aws_caller_identity" "current" {}
 
 module "vpc" {
-  source = "terraform-aws-modules/vpc/aws"
+  source  = "terraform-aws-modules/vpc/aws"
+  version = "~> 6.0"
 
   name = "my-vpc"
   cidr = "10.0.0.0/16"
@@ -58,19 +59,14 @@ module "chainlink_ea" {
       log_level               = "info"      # optional, default to "info"
       alarms_disabled         = "false"     # optional, default to "false", global monitoring variable should be true
 
-      # Optional block for secret environment variables required by the adapter
-      # For each secret variable, AWS Secrets Manager object and its value will be created
-      # It's possible to leave value as an empty string, in this case only AWS Secrets Manager object
-      #   will be created. Then you need to set the value for this object manually using AWS web console
-      #   or CLI. In this case value of the secret variable won't be stored in terraform state files.
-      ea_secret_variables = {
-        API_KEY = "API_KEY_VALUE" # https://www.coingecko.com/en/developers/dashboard
-      }
+      # Names of SecureString parameters. Create them before apply:
+      # /example/nonprod/ea/coingecko/API_KEY
+      ea_secret_parameters = ["API_KEY"]
 
       # Optional block for any specific anvironment variables required by adapter
       ea_specific_variables = {
-        SPECIFIC_VAR_KEY_1 = "SPECIFIC_VAR_VALUE_1",
-        SPECIFIC_VAR_KEY_1 = "SPECIFIC_VAR_VALUE_2"
+        SPECIFIC_VAR_KEY_1 = "SPECIFIC_VAR_VALUE_1"
+        SPECIFIC_VAR_KEY_2 = "SPECIFIC_VAR_VALUE_2"
       }
     }
   }
