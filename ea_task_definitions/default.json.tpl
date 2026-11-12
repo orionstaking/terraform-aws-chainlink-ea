@@ -37,9 +37,9 @@
         { "name" : "LOG_LEVEL", "value" : "${log_level}" }
       ],
     "secrets": ${jsonencode([
-      for secret in ea_secret_variables : {
-        name      = "${secret.name}"
-        valueFrom = "${secret.valueFrom}" 
+      for secret in ea_secret_parameters : {
+        name      = secret.name
+        valueFrom = secret.valueFrom
       }
     ])},
     "logConfiguration": {

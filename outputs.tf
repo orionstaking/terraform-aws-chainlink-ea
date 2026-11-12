@@ -13,6 +13,11 @@ output "chainlink_ea_memory_db_port" {
   value       = var.cache_redis ? aws_memorydb_cluster.this[0].cluster_endpoint[0].port : ""
 }
 
+output "ea_secret_parameter_names" {
+  description = "SSM Parameter Store names the task execution role reads for ea_secret_parameters"
+  value       = local.secret_parameter_names
+}
+
 output "alb_security_group_id" {
   description = "ID of security group attached to ALB. Used to configure additional rules. ALB has restricted access by default"
   value       = aws_security_group.alb_sg.id
